@@ -302,36 +302,38 @@ function SessionRoute() {
                 onComplete={() => {
                   // Optional: auto-advance or notification when timer completes
                 }}
-              />
+              >
+
+                <div className="mt-4 sm:mt-6 grid grid-cols-3 gap-3">
+                  <LogField
+                    label={isTime ? "Seconds" : "Reps"}
+                    value={reps}
+                    onChange={setReps}
+                    hintText={isTime ? "How many seconds you did the exercise" : "How many repetitions you did"}
+                    placeholder={String(current.target)}
+                  />
+                  <LogField
+                    label="Weight"
+                    value={weight}
+                    onChange={setWeight}
+                    hintText="How much weight you used"
+                    placeholder="—"
+                  />
+                  <LogField
+                    label="RPE"
+                    value={rpe}
+                    onChange={setRpe}
+                    hintText="How hard the exercise was (1–10, 1 being easy)"
+                    placeholder="1–10"
+                  />
+                </div>
+
+                <Button className="mt-4 w-full" onClick={completeSet}>
+                  {setNumber >= current.sets && active.index >= total - 1 ? "Finish session" : "Complete set"}
+                </Button>
+              </ExerciseCountdown>
             </div>
 
-            <div className="mt-4 sm:mt-6 grid grid-cols-3 gap-3">
-              <LogField
-                label={isTime ? "Seconds" : "Reps"}
-                value={reps}
-                onChange={setReps}
-                hintText={isTime ? "How many seconds you did the exercise" : "How many repetitions you did"}
-                placeholder={String(current.target)}
-              />
-              <LogField
-                label="Weight"
-                value={weight}
-                onChange={setWeight}
-                hintText="How much weight you used"
-                placeholder="—"
-              />
-              <LogField
-                label="RPE"
-                value={rpe}
-                onChange={setRpe}
-                hintText="How hard the exercise was (1–10, 1 being easy)"
-                placeholder="1–10"
-              />
-            </div>
-
-            <Button className="mt-4 w-full" onClick={completeSet}>
-              {setNumber >= current.sets && active.index >= total - 1 ? "Finish session" : "Complete set"}
-            </Button>
 
             <Button
               variant="outline"

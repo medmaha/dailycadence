@@ -1,9 +1,11 @@
-import { useEffect, useRef, useState } from "react";
+import { cn } from "@/lib/utils";
+import { ReactNode, useEffect, useRef, useState } from "react";
 
 interface ExerciseCountdownProps {
   target: number;
   unit: "seconds" | "reps";
   onComplete?: () => void;
+  children: ReactNode
 }
 
 /**
@@ -11,7 +13,7 @@ interface ExerciseCountdownProps {
  * For time-based exercises: counts down from target seconds
  * For rep-based exercises: acts as a pacing guide (optional)
  */
-export function ExerciseCountdown({ target, unit, onComplete }: ExerciseCountdownProps) {
+export function ExerciseCountdown({ target, unit, onComplete, children }: ExerciseCountdownProps) {
   const [timeLeft, setTimeLeft] = useState(target);
   const [isRunning, setIsRunning] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
@@ -90,62 +92,68 @@ export function ExerciseCountdown({ target, unit, onComplete }: ExerciseCountdow
   const isComplete = timeLeft <= 0;
 
   return (
-    <div className="rounded-xl border border-border bg-surface p-4">
-      <div className="mb-3 flex items-center justify-between">
-        <span className="text-xs uppercase tracking-wider text-muted-foreground">
-          {unit === "seconds" ? "Timer" : "Pacing"}
-        </span>
-        <span className="tabular font-display text-2xl text-primary">
-          {timeLeft}
-          <span className="ml-1 text-sm text-muted-foreground">
-            {unit === "seconds" ? "s" : ""}
+    <>
+      <div className="rounded-xl border border-border bg-surface p-4">
+        <div className="mb-3 flex items-center justify-between">
+          <span className="text-xs uppercase tracking-wider text-muted-foreground">
+            {unit === "seconds" ? "Timer" : "Pacing"}
           </span>
-        </span>
-      </div>
+          <span className="tabular font-display text-2xl text-primary">
+            {timeLeft}
+            <span className="ml-1 text-sm text-muted-foreground">
+              {unit === "seconds" ? "s" : ""}
+            </span>
+          </span>
+        </div>
 
-      {/* Progress bar */}
-      <div className="mb-3 h-2 rounded-full bg-surface-2">
-        <div
-          className="h-full rounded-full bg-primary transition-all duration-300"
-          style={{ width: `${progress}%` }}
-        />
-      </div>
+        {/* Progress bar */}
+        <div className="mb-3 h-2 rounded-full bg-surface-2">
+          <div
+            className="h-full rounded-full bg-primary transition-all duration-300"
+            style={{ width: `${progress}%` }}
+          />
+        </div>
 
-      {/* Controls */}
-      <div className="flex gap-2">
-        {!isRunning ? (
-          <button
-            onClick={handleStart}
-            className="flex-1 rounded-lg bg-primary px-3 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-          >
-            {isComplete ? "Restart" : "Start"}
-          </button>
-        ) : (
-          <>
-            {isPaused ? (
-              <button
-                onClick={handleResume}
-                className="flex-1 rounded-lg bg-primary px-3 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-              >
-                Resume
-              </button>
-            ) : (
-              <button
-                onClick={handlePause}
-                className="flex-1 rounded-lg border border-border px-3 py-2 text-sm font-medium transition-colors hover:bg-surface-2"
-              >
-                Pause
-              </button>
-            )}
+        {/* Controls */}
+        <div className="flex gap-2">
+          {!isRunning ? (
             <button
-              onClick={handleReset}
-              className="rounded-lg border border-border px-3 py-2 text-sm font-medium transition-colors hover:bg-surface-2"
+              onClick={handleStart}
+              className={cn(
+                "flex-1 rounded-lg bg-primary px-3 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90",
+                isComplete && "bg-secondary"
+              )}
             >
-              Reset
+              {isComplete ? "Restart" : "Start"}
             </button>
-          </>
-        )}
+          ) : (
+            <>
+              {isPaused ? (
+                <button
+                  onClick={handleResume}
+                  className="flex-1 rounded-lg bg-primary px-3 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+                >
+                  Resume
+                </button>
+              ) : (
+                <button
+                  onClick={handlePause}
+                  className="flex-1 rounded-lg bg-surface border border-border px-3 py-2 text-sm font-medium transition-colors hover:bg-surface-2"
+                >
+                  Pause
+                </button>
+              )}
+              <button
+                onClick={handleReset}
+                className="rounded-lg border border-border px-3 py-2 text-sm font-medium transition-colors hover:bg-surface-2"
+              >
+                Reset
+              </button>
+            </>
+          )}
+        </div>
       </div>
-    </div>
+      {isComplete && children}
+    </>
   );
 }
