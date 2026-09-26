@@ -97,6 +97,8 @@
     overscroll-behavior-y: none;
   }
 
+
+
   h1,
   h2,
   h3,
@@ -112,15 +114,19 @@
   }
 }
 
+@media (max-width: 640px) {
+  body {
+    padding-top: env(safe-area-inset-top, 10px);
+    padding-bottom: env(safe-area-inset-bottom, 10px);
+  }
+}
+
 @utility card-surface {
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-xl);
 }
 
-@utility hairline-top {
-  border-top: 1px solid var(--color-border);
-}
 
 @utility tabular {
   font-variant-numeric: tabular-nums;
