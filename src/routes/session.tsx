@@ -320,11 +320,11 @@ function SessionRoute() {
                     placeholder="—"
                   />
                   <LogField
-                    label="RPE"
+                    label="Rating Assertion"
                     value={rpe}
                     onChange={setRpe}
-                    hintText="How hard the exercise was (1–10, 1 being easy)"
-                    placeholder="1–10"
+                    hintText="How hard the exercise was (1-10, 1 being easy)"
+                    placeholder="1-10"
                   />
                 </div>
 
@@ -409,7 +409,7 @@ function LogField({
   return (
     <label className="block">
       <div className="flex items-center gap-1">
-        <span className="text-[0.7rem] uppercase tracking-[0.14em] text-muted-foreground pl-1">
+        <span className="text-[0.7rem] uppercase tracking-[0.14em] text-muted-foreground pl-1 truncate flex-1">
           {label}
         </span>
         <Tooltip>
