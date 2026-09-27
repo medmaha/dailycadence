@@ -1,8 +1,10 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 
-import { Button, Card, Chip, Eyebrow, Screen } from "@/components/ui-kit";
+import { Card, Eyebrow, Screen } from "@/components/ui-kit";
+import { ReminderSettings } from "@/components/ReminderSettings";
+import { ProfileSettings } from "@/components/ProfileSettings";
+import { SettingsActions } from "@/components/SettingsActions";
 import { clearToday, resetAll, useProfile } from "@/lib/store";
-import { Equipment, Level, Goal } from "@/lib/types";
 
 export const Route = createFileRoute("/settings")({
   head: () => ({
@@ -21,25 +23,6 @@ export const Route = createFileRoute("/settings")({
   }),
   component: Settings,
 });
-
-const GOALS: { id: Goal; label: string }[] = [
-  { id: "strength", label: "Strength" },
-  { id: "mobility", label: "Mobility" },
-  { id: "endurance", label: "Endurance" },
-  { id: "general", label: "General" },
-];
-const EQUIPMENT: { id: Equipment; label: string }[] = [
-  { id: "none", label: "Bodyweight" },
-  { id: "bands", label: "Bands" },
-  { id: "dumbbells", label: "Dumbbells" },
-  { id: "pullupbar", label: "Pull-up bar" },
-];
-const LEVELS: { id: Level; label: string }[] = [
-  { id: "new", label: "New" },
-  { id: "returning", label: "Getting back" },
-  { id: "trained", label: "Consistent" },
-];
-const TIMES = [10, 20, 30, 45];
 
 function Settings() {
   const navigate = useNavigate();
@@ -68,78 +51,27 @@ function Settings() {
         </p>
       </header>
 
-      <Card className="mt-6 space-y-6 animate-rise">
-        <Group label="Goal">
-          {GOALS.map((g) => (
-            <Chip key={g.id} selected={profile.goal === g.id} onClick={() => update({ goal: g.id })}>
-              {g.label}
-            </Chip>
-          ))}
-        </Group>
+      <ProfileSettings
+        goal={profile.goal}
+        equipment={profile.equipment}
+        minutes={profile.minutes}
+        level={profile.level}
+        onUpdate={update}
+      />
 
-        <Group label="Equipment">
-          {EQUIPMENT.map((e) => (
-            <Chip
-              key={e.id}
-              selected={profile.equipment.includes(e.id)}
-              onClick={() => {
-                const next = profile.equipment.includes(e.id)
-                  ? profile.equipment.filter((x) => x !== e.id)
-                  : [...profile.equipment, e.id];
-                update({ equipment: next.length ? next : ["none"] });
-              }}
-            >
-              {e.label}
-            </Chip>
-          ))}
-        </Group>
-
-        <Group label="Session length">
-          {TIMES.map((t) => (
-            <Chip key={t} selected={profile.minutes === t} onClick={() => update({ minutes: t })}>
-              {t} min
-            </Chip>
-          ))}
-        </Group>
-
-        <Group label="Experience">
-          {LEVELS.map((l) => (
-            <Chip key={l.id} selected={profile.level === l.id} onClick={() => update({ level: l.id })}>
-              {l.label}
-            </Chip>
-          ))}
-        </Group>
+      <Card className="mt-6 animate-rise">
+        <ReminderSettings />
       </Card>
 
-      <div className="mt-8 flex flex-wrap gap-3">
-        <Button variant="outline" onClick={() => navigate({ to: "/onboarding" })}>
-          Run setup again
-        </Button>
-        <Button
-          variant="ghost"
-          onClick={() => {
-            if (confirm("Delete all sessions and settings on this device?")) {
-              resetAll();
-              navigate({ to: "/onboarding" });
-            }
-          }}
-        >
-          Erase all data
-        </Button>
-      </div>
-
-      <p className="mt-8 text-xs text-muted-foreground">
-        Everything stays on this device, so sessions and timers keep working with no connection.
-      </p>
+      <SettingsActions
+        onRunSetup={() => navigate({ to: "/onboarding" })}
+        onEraseData={() => {
+          if (confirm("Delete all sessions and settings on this device?")) {
+            resetAll();
+            navigate({ to: "/onboarding" });
+          }
+        }}
+      />
     </Screen>
-  );
-}
-
-function Group({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div>
-      <Eyebrow>{label}</Eyebrow>
-      <div className="mt-3 flex flex-wrap gap-2">{children}</div>
-    </div>
   );
 }
