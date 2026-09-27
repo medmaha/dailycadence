@@ -11,6 +11,18 @@ import { useRef, useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { setupServiceWorker } from "../lib/pwa";
+import { initNotificationSettings } from "@/lib/push-notification";
+import { initRingtoneSettings } from "@/lib/audioManager";
+import { initExerciseReminderSettings } from "@/lib/reminders";
+
+declare global {
+  interface Window {
+    _REMINDERS_KEY: string
+    _RINGTONES_KEY: string
+    _SOUND_ENABLED_KEY: string
+    _DEFAULT_RINGTONE: Record<string, any>
+  }
+}
 
 function NotFoundComponent() {
   return (
@@ -125,10 +137,13 @@ function RootComponent() {
   const loaded = useRef<boolean>(false)
 
   useEffect(() => {
-    if (!loaded.current){
+    if (!loaded.current) {
       loaded.current = true
       void setupServiceWorker();
     }
+    initRingtoneSettings()
+    initNotificationSettings()
+    initExerciseReminderSettings()
   }, []);
 
   return (

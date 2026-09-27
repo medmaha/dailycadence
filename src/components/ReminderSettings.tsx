@@ -2,16 +2,16 @@ import { useState, useEffect } from "react";
 
 import { Button, Card, Eyebrow } from "@/components/ui-kit";
 import {
+  requestNotificationPermission,
+  areNotificationsEnabled,
+} from "@/lib/push-notification";
+import {
   addReminder,
   deleteReminder,
   updateReminder,
   getReminders,
-  requestNotificationPermission,
-  areNotificationsEnabled,
   type Reminder,
-  formatTime,
-  parseTime,
-} from "@/lib/notifications";
+} from "@/lib/reminders";
 
 const DAYS = [
   { id: 0, label: "Sun" },
@@ -83,8 +83,10 @@ export function ReminderSettings() {
   };
 
   const handleDeleteReminder = (id: string) => {
-    deleteReminder(id);
-    setReminders(reminders.filter((r) => r.id !== id));
+    if (confirm("Are you sure?")) {
+      deleteReminder(id);
+      setReminders(reminders.filter((r) => r.id !== id));
+    }
   };
 
   const handleToggleReminder = (id: string, enabled: boolean) => {
@@ -196,11 +198,10 @@ export function ReminderSettings() {
                       key={day.id}
                       type="button"
                       onClick={() => toggleDay(day.id)}
-                      className={`rounded-full border px-3 py-1.5 text-sm transition-colors ${
-                        selectedDays.includes(day.id)
-                          ? "border-primary bg-primary/12 text-primary"
-                          : "border-border-strong text-muted-foreground hover:text-foreground"
-                      }`}
+                      className={`rounded-full border px-3 py-1.5 text-sm transition-colors ${selectedDays.includes(day.id)
+                        ? "border-primary bg-primary/12 text-primary"
+                        : "border-border-strong text-muted-foreground hover:text-foreground"
+                        }`}
                     >
                       {day.label}
                     </button>
@@ -267,14 +268,12 @@ function ReminderItem({
           <p className="font-display text-lg">{reminder.time}</p>
           <button
             onClick={() => onToggle(!reminder.enabled)}
-            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-              reminder.enabled ? "bg-primary" : "bg-surface-2"
-            }`}
+            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${reminder.enabled ? "bg-primary" : "bg-surface-2"
+              }`}
           >
             <span
-              className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                reminder.enabled ? "translate-x-6" : "translate-x-1"
-              }`}
+              className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${reminder.enabled ? "translate-x-6" : "translate-x-1"
+                }`}
             />
           </button>
         </div>

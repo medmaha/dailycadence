@@ -1,7 +1,5 @@
-import { startReminderChecks } from "./notifications";
+import { startReminderChecks } from "./reminders";
 import { registerSW } from "virtual:pwa-register";
-
-const SW_URL = "/sw.js";
 
 /**
  * Service worker registrar for the app shell.
