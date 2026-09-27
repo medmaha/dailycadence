@@ -353,16 +353,20 @@ function SessionRoute() {
                   alternatives.map((alt) => (
                     <button
                       key={alt.id}
-                      onClick={() => substitute(alt)}
-                      className="ring-focus w-full rounded-xl border border-border bg-surface p-4 text-left transition-colors hover:border-border-strong active:animate-pop"
+                      onClick={() => {
+                        if (confirm(`Switch exercise to ${alt.name}`)){
+                          substitute(alt)
+                        }
+                      }}
+                      className="ring-focus block w-full rounded-xl border border-border bg-surface p-4 text-left transition-colors hover:border-border-strong active:animate-pop"
                     >
-                      <div className="flex items-start gap-3">
-                        <div className="shrink-0">
-                          <ExerciseAnimation exerciseId={alt.id} className="w-16" showLabel={false} />
+                      <div className="flex items-start gap-2 h-max">
+                        <div className="h-max">
+                          <ExerciseAnimation exerciseId={alt.id} className="w-16 h-18! min-h-18"/>
                         </div>
                         <div className="flex-1">
                           <p className="font-display">{alt.name}</p>
-                          <p className="mt-0.5 text-xs text-muted-foreground">{alt.cue}</p>
+                          <p className="text-xs text-muted-foreground line-clamp-3">{alt.cue}</p>
                         </div>
                       </div>
                     </button>

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { getAssetUrl } from "@bryllim/workout-guide";
 
+import { cn } from "@/lib/utils";
 import { getWorkoutGuideId } from "@/lib/exercise-animations";
 
 interface ExerciseAnimationProps {
@@ -45,7 +46,7 @@ export function ExerciseAnimation({ exerciseId, className = "", showLabel = true
   }
 
   return (
-    <div className={`relative ${className}`}>
+    <div className={cn(`relative bg-secondary/10 rounded-xl min-h-45`, className)}>
       <img
         src={assetUrl}
         alt={`Exercise demonstration frame ${currentFrame}`}
@@ -55,11 +56,11 @@ export function ExerciseAnimation({ exerciseId, className = "", showLabel = true
           (e.target as HTMLImageElement).style.display = "none";
         }}
       />
-      {showLabel && (
+      {/* {showLabel && (
         <p className="mt-0.5 text-center text-xs text-muted-foreground">
           Exercise demonstration
         </p>
-      )}
+      )} */}
     </div>
   );
 }
