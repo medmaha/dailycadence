@@ -29,7 +29,7 @@ export default defineConfig({
                 type: "classic",
             },
             workbox: {
-                importScripts: ['/service-worker/push.js', '/service-worker/assets-loader.js'],
+                importScripts: ['/service-worker/push.js', '/service-worker/reminder.js', '/service-worker/assets-loader.js'],
                 globPatterns: [
                     "**/*.{js,css,html,png,svg,ico,woff2,webmanifest}",
                 ],

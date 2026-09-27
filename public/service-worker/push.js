@@ -1,4 +1,4 @@
-console.debug("[SW-LOADED]: push.js")
+console.debug("[SW-LOADED]: push-notification")
 
 // Listen to the backend push event
 self.addEventListener('push', (event) => {
@@ -6,7 +6,6 @@ self.addEventListener('push', (event) => {
     try {
       const data = event.data.json();
       const { title, body, icon, ...rest } = data;
-  
       event.waitUntil(
         self.registration.showNotification(title, {
           body: body,
@@ -21,7 +20,6 @@ self.addEventListener('push', (event) => {
           icon: '/icon-192.png',
         })
       );
-
     }
   }
 });
