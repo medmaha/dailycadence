@@ -292,7 +292,7 @@ export async function uploadRingtone(file: File): Promise<Ringtone> {
   }
 }
 
-function getRingtoneById(id?: string) {
+export function getRingtoneById(id?: string) {
   if (!id) return null
   return getRingtones().find(r => r.id === id) || null
 }
@@ -300,10 +300,13 @@ function getRingtoneById(id?: string) {
 /**
  * Play a ringtone for testing
  */
-export function playRingtone(ringtone_id?: string): void {
-  if (!isSoundEnabled()) return;
-
-  const ringtone = (getRingtoneById(ringtone_id)) || DEFAULT_RINGTONE
-  const audio = new Audio(ringtone.dataUrl);
-  audio.play().catch(console.error)
+export async function playRingtone(ringtone_id?: string) {
+  try {
+    if (!isSoundEnabled()) return;
+    const ringtone = (getRingtoneById(ringtone_id)) || DEFAULT_RINGTONE
+    const audio = new Audio(ringtone.dataUrl);
+    await audio.play()
+  } catch (error) {
+    console.error(error)
+  }
 }
