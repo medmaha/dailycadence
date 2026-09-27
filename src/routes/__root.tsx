@@ -7,7 +7,7 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { useRef, useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { setupServiceWorker } from "../lib/pwa";
@@ -122,8 +122,13 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const loaded = useRef<boolean>(false)
+
   useEffect(() => {
-    void setupServiceWorker();
+    if (!loaded.current){
+      loaded.current = true
+      void setupServiceWorker();
+    }
   }, []);
 
   return (

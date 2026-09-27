@@ -24,9 +24,16 @@ export default defineConfig({
             injectRegister: null,
             filename: "sw.js",
             manifest: false,
-            devOptions: { enabled: false },
+            devOptions: {
+                enabled: true,
+                type: "classic",
+            },
             workbox: {
-                globPatterns: ["**/*.{js,css,png,svg,ico,woff2,webmanifest}"],
+                importScripts: ['/service-worker/push.js', '/service-worker/assets-loader.js'],
+                globPatterns: [
+                    "**/*.{js,css,html,png,svg,ico,woff2,webmanifest}",
+                ],
+                // disableDevLogs: true,
                 navigateFallback: null,
                 cleanupOutdatedCaches: true,
                 runtimeCaching: [
