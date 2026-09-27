@@ -1,3 +1,8 @@
+import { startReminderChecks } from "./notifications";
+import { registerSW } from "virtual:pwa-register";
+
+const SW_URL = "/sw.js";
+
 /**
  * Service worker registrar for the app shell.
  * It refuses to register in certain contexts:
@@ -6,8 +11,6 @@
  * - If the current window's hostname includes "preview" or "beta"
  * - If the current URL includes a query parameter "sw=off"
  */
-const SW_URL = "/sw.js";
-
 function isBlockedContext() {
     if (typeof window === "undefined") return true;
     if (window.self !== window.top) return true; // Iframe or popups
@@ -41,7 +44,7 @@ export async function setupServiceWorker() {
             await Promise.allSettled(
                 registrations
                     .filter((r) =>
-                        (r.active?.scriptURL ?? r.installing?.scriptURL ?? "").endsWith(SW_URL),
+                        !!(r.active?.scriptURL ?? r.installing?.scriptURL)
                     )
                     .map((r) => r.unregister()),
             );
@@ -53,7 +56,18 @@ export async function setupServiceWorker() {
 
     try {
         // Register the service worker
-        await navigator.serviceWorker.register(SW_URL, { scope: "/" });
+        registerSW({
+            immediate: true,
+            onNeedReload() {
+                // defer reload to next spa navigation
+                if (confirm("New version available. Update required")) {
+                    window.location.reload()
+                }
+            },
+            onRegisteredSW() {
+                startReminderChecks();
+            }
+        });
     } catch {
         /* offline support is optional */
     }
