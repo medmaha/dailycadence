@@ -14,7 +14,13 @@ export function Screen({
 }) {
   return (
     <div className="min-h-screen bg-background">
-      <div className={cn("mx-auto w-full max-w-xl px-5 pt-8", nav && "pb-32", className)}>
+      <div className={cn(
+        "mx-auto w-full max-w-xl",
+        "px-5 pt-8",
+        "pb-[max(2rem,env(safe-area-inset-bottom))]",
+        nav && "pb-[max(8rem,env(safe-area-inset-bottom))]",
+        className
+      )}>
         {children}
       </div>
       {nav ? <TabBar /> : null}
