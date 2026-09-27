@@ -1,12 +1,10 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import { InfoIcon } from "lucide-react"
-
-import { Button, Eyebrow, Screen } from "@/components/ui-kit";
-import { ExerciseAnimation } from "@/components/ExerciseAnimation";
-import { ExerciseCountdown } from "@/components/ExerciseCountdown";
-import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
+import { Button, Screen } from "@/components/ui-kit";
+import { SessionSummary } from "@/components/session/SessionSummary";
+import { RestTimer } from "@/components/session/RestTimer";
+import { ExerciseDetail } from "@/components/session/ExerciseDetail";
 import {
   alternativesFor,
   EXERCISE_BY_ID,
@@ -19,7 +17,7 @@ import {
   useProfile,
   useTodayWorkout,
 } from "@/lib/store";
-import type { Exercise, ActiveSession, SetLog } from "@/lib/types";
+import type { Exercise, ActiveSession } from "@/lib/types";
 
 export const Route = createFileRoute("/session")({
   head: () => ({
@@ -179,32 +177,13 @@ function SessionRoute() {
   if (finished) {
     return (
       <Screen nav={false}>
-        <div className="animate-rise pt-16">
-          <Eyebrow>Session complete</Eyebrow>
-          <h1 className="mt-3 text-4xl font-semibold">That's logged.</h1>
-          <div className="mt-10 grid grid-cols-3 gap-4 border-t border-border pt-6">
-            <div>
-              <p className="tabular font-display text-3xl">{finished.minutes}</p>
-              <p className="mt-1 text-xs text-muted-foreground">minutes</p>
-            </div>
-            <div>
-              <p className="tabular font-display text-3xl">{finished.sets}</p>
-              <p className="mt-1 text-xs text-muted-foreground">sets</p>
-            </div>
-            <div>
-              <p className="tabular font-display text-3xl">{finished.volume}</p>
-              <p className="mt-1 text-xs text-muted-foreground">volume</p>
-            </div>
-          </div>
-          <div className="mt-10 flex gap-3">
-            <Button size="lg" className="flex-1" onClick={() => navigate({ to: "/progress" })}>
-              See progress
-            </Button>
-            <Button variant="outline" size="lg" onClick={() => navigate({ to: "/" })}>
-              Home
-            </Button>
-          </div>
-        </div>
+        <SessionSummary
+          minutes={finished.minutes}
+          sets={finished.sets}
+          volume={finished.volume}
+          onSeeProgress={() => navigate({ to: "/progress" })}
+          onGoHome={() => navigate({ to: "/" })}
+        />
       </Screen>
     );
   }
@@ -263,175 +242,38 @@ function SessionRoute() {
         ))}
       </div>
 
-      <TooltipProvider>
-
-        {rest > 0 ? (
-          <section className="mt-12 animate-rise text-center">
-            <Eyebrow>Rest</Eyebrow>
-            <p className="tabular mt-4 font-display text-7xl">{rest}</p>
-            <p className="mt-4 text-sm text-muted-foreground">
-              Next: {exercise.name} · set {setNumber} of {current.sets}
-            </p>
-            <div className="mt-10 flex justify-center gap-3">
-              <Button variant="outline" onClick={() => setRest((r) => r + 20)}>
-                +20s
-              </Button>
-              <Button onClick={() => setRest(0)}>Skip rest</Button>
-            </div>
-          </section>
-        ) : (
-          <section className="mt-6 sm:mt-10 animate-rise" key={exercise.id + setNumber}>
-            <Eyebrow>
-              Set {setNumber} of {current.sets}
-            </Eyebrow>
-            <h1 className="sm:mt-3 mt-2 text-3xl sm:text-4xl font-semibold leading-tight">{exercise.name}</h1>
-            <p className="tabular sm:mt-2 font-display text-xl sm:text-2xl text-primary">
-              {current.target}
-              {isTime ? " seconds" : " reps"}
-            </p>
-            <p className="mt-4 text-sm text-muted-foreground">{exercise.cue}</p>
-
-            <div className="mt-2">
-              <ExerciseAnimation exerciseId={exercise.id} className="mx-auto max-w-50" />
-            </div>
-
-            <div className="mt-4">
-              <ExerciseCountdown
-                target={current.target}
-                unit={exercise.unit}
-                onComplete={() => {
-                  // Optional: auto-advance or notification when timer completes
-                }}
-              >
-
-                <div className="mt-4 sm:mt-6 grid grid-cols-3 gap-3">
-                  <LogField
-                    label={isTime ? "Seconds" : "Reps"}
-                    value={reps}
-                    onChange={setReps}
-                    hintText={isTime ? "How many seconds you did the exercise" : "How many repetitions you did"}
-                    placeholder={String(current.target)}
-                  />
-                  <LogField
-                    label="Weight"
-                    value={weight}
-                    onChange={setWeight}
-                    hintText="How much weight you used"
-                    placeholder="—"
-                  />
-                  <LogField
-                    label="Rating Assertion"
-                    value={rpe}
-                    onChange={setRpe}
-                    hintText="How hard the exercise was (1-10, 1 being easy)"
-                    placeholder="1-10"
-                  />
-                </div>
-
-                <Button className="mt-4 w-full" onClick={completeSet}>
-                  {setNumber >= current.sets && active.index >= total - 1 ? "Finish session" : "Complete set"}
-                </Button>
-              </ExerciseCountdown>
-            </div>
-
-
-            <Button
-              variant="outline"
-              onClick={() => setSwapOpen((s) => !s)}
-              className="ring-focus mt-4 w-full rounded-xl border border-border px-2 py-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
-            >
-              Can't do this one - show alternatives
-            </Button>
-
-            {swapOpen ? (
-              <div className="mt-3 animate-rise space-y-2">
-                {alternatives.length === 0 ? (
-                  <p className="text-sm text-muted-foreground">
-                    No close match with your equipment. Skip it and keep moving.
-                  </p>
-                ) : (
-                  alternatives.map((alt) => (
-                    <button
-                      key={alt.id}
-                      onClick={() => {
-                        if (confirm(`Switch exercise to ${alt.name}`)){
-                          substitute(alt)
-                        }
-                      }}
-                      className="ring-focus block w-full rounded-xl border border-border bg-surface p-4 text-left transition-colors hover:border-border-strong active:animate-pop"
-                    >
-                      <div className="flex items-start gap-2 h-max">
-                        <div className="h-max">
-                          <ExerciseAnimation exerciseId={alt.id} className="w-16 h-18! min-h-18"/>
-                        </div>
-                        <div className="flex-1">
-                          <p className="font-display">{alt.name}</p>
-                          <p className="text-xs text-muted-foreground line-clamp-3">{alt.cue}</p>
-                        </div>
-                      </div>
-                    </button>
-                  ))
-                )}
-              </div>
-            ) : null}
-
-            {active.index < total - 1 ? (
-              <button
-                onClick={() => patch({ index: active.index + 1 })}
-                className="ring-focus mt-4 sm:mt-6 w-full text-xs text-muted-foreground hover:text-foreground"
-              >
-                Skip exercise
-              </button>
-            ) : (
-              <button
-                onClick={() => finishWorkout(active)}
-                className="ring-focus mt-4 sm:mt-6 w-full text-xs text-muted-foreground hover:text-foreground"
-              >
-                End session early
-              </button>
-            )}
-          </section>
-        )}
-      </TooltipProvider>
+      {rest > 0 ? (
+        <RestTimer
+          rest={rest}
+          exerciseName={exercise.name}
+          setNumber={setNumber}
+          totalSets={current.sets}
+          onAddTime={() => setRest((r) => r + 20)}
+          onSkipRest={() => setRest(0)}
+        />
+      ) : (
+        <ExerciseDetail
+          exercise={exercise}
+          setNumber={setNumber}
+          totalSets={current.sets}
+          target={current.target}
+          isTime={isTime}
+          reps={reps}
+          weight={weight}
+          rpe={rpe}
+          onRepsChange={setReps}
+          onWeightChange={setWeight}
+          onRpeChange={setRpe}
+          onCompleteSet={completeSet}
+          onShowAlternatives={() => setSwapOpen((s) => !s)}
+          showAlternatives={swapOpen}
+          alternatives={alternatives}
+          onSubstitute={substitute}
+          onSkipExercise={() => patch({ index: active.index + 1 })}
+          onFinishEarly={() => finishWorkout(active)}
+          isLastExercise={active.index >= total - 1}
+        />
+      )}
     </Screen>
-  );
-}
-
-function LogField({
-  label,
-  value,
-  onChange,
-  hintText,
-  placeholder,
-}: {
-  label: string;
-  value: string;
-  hintText: string
-  onChange: (v: string) => void;
-  placeholder?: string;
-}) {
-  return (
-    <label className="block">
-      <div className="flex items-center gap-1">
-        <span className="text-[0.7rem] uppercase tracking-[0.14em] text-muted-foreground pl-1 truncate flex-1">
-          {label}
-        </span>
-        <Tooltip>
-          <TooltipTrigger>
-            <InfoIcon className="w-3 h-3" />
-          </TooltipTrigger>
-          <TooltipContent className="bg-secondary text-secondary-foreground border border-secondary-foreground/60 shadow-2xl py-4 px-3">
-            {hintText}
-          </TooltipContent>
-        </Tooltip>
-      </div>
-      <input
-        inputMode="decimal"
-        value={value}
-        placeholder={placeholder}
-        onChange={(e) => onChange(e.target.value.replace(/[^\d.]/g, ""))}
-        className="tabular ring-focus mt-1 sm:mt-1.5 w-full rounded-xl border border-input bg-surface p-2 font-display text-lg sm:text-xl sm:p-3 outline-none placeholder:text-muted-foreground/60"
-      />
-    </label>
   );
 }
