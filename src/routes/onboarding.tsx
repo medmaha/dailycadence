@@ -2,7 +2,8 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 
 import { Button, Chip, Eyebrow, Screen } from "@/components/ui-kit";
-import { clearToday, useProfile } from "@/lib/store";
+import { clearToday } from "@/lib/store";
+import { useProfile } from "@/hooks/profile";
 import type { Equipment, Level, Goal } from "@/lib/types";
 
 export const Route = createFileRoute("/onboarding")({

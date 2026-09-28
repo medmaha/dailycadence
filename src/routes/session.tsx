@@ -13,11 +13,18 @@ import {
 import {
   saveSession,
   todayKey,
-  useActiveSession,
-  useProfile,
-  useTodayWorkout,
 } from "@/lib/store";
-import type { Exercise, ActiveSession } from "@/lib/types";
+
+import {
+  useProfile,
+} from "@/hooks/profile";
+
+import {
+  useActiveSession,
+  useTodayWorkout,
+} from "@/hooks/exercise";
+
+import type { Exercise, ActiveSession, SetLog } from "@/lib/types";
 
 export const Route = createFileRoute("/session")({
   head: () => ({

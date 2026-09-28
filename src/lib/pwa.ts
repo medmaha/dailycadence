@@ -1,5 +1,6 @@
-import { startReminderChecks } from "./reminders";
-import { registerSW } from "virtual:pwa-register";
+import { initNotificationSettings } from "./push-notification";
+import { initReminderSettings, startReminderChecks } from "./reminders";
+import { initRingtoneSettings } from "./ringtones";
 
 /**
  * Service worker registrar for the app shell.
@@ -54,18 +55,31 @@ export async function setupServiceWorker() {
 
     try {
         // Register the service worker
-        registerSW({
-            immediate: true,
-            onNeedReload() {
-                // defer reload to next spa navigation
-                if (confirm("New version available. Update required")) {
-                    window.location.reload()
-                }
-            },
-            onRegisteredSW() {
-                startReminderChecks();
-            }
-        });
+        if (!("serviceWorker" in navigator)) return;
+
+        navigator.serviceWorker
+            .register("/sw.js", { scope: "/", type: "classic" })
+            .then((registration) => {
+                initReminderSettings()
+                initRingtoneSettings()
+                initNotificationSettings()
+                // 
+                startReminderChecks()
+                registration.addEventListener("updatefound", () => {
+                    const newWorker = registration.installing;
+                    newWorker?.addEventListener("statechange", () => {
+                        if (newWorker.state === "installed" && navigator.serviceWorker.controller) {
+                            // A new SW is ready — mirrors onNeedRefresh
+                            console.log("New content available, refresh to update.");
+                            // e.g. show your own "reload" toast here, or:
+                            // newWorker.postMessage({ type: "SKIP_WAITING" });
+                        }
+                    });
+                });
+            })
+            .catch(console.error);
+
+
     } catch {
         /* offline support is optional */
     }

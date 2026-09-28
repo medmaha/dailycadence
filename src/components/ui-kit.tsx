@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import type { ButtonHTMLAttributes, ReactNode } from "react";
+import { useEffect, useRef, type ButtonHTMLAttributes, type ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
 
@@ -73,8 +73,8 @@ export function Eyebrow({ children }: { children: ReactNode }) {
 }
 
 type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
-  variant?: "primary" | "ghost" | "outline" | "quiet";
-  size?: "md" | "lg";
+  variant?: "primary" | "ghost" | "outline" | "quiet" | "danger";
+  size?: "md" | "lg" | "icon";
 };
 
 export function Button({ variant = "primary", size = "md", className, ...props }: ButtonProps) {
@@ -83,11 +83,14 @@ export function Button({ variant = "primary", size = "md", className, ...props }
       {...props}
       className={cn(
         "ring-focus inline-flex items-center justify-center gap-2 rounded-xl font-medium transition-all active:animate-pop disabled:pointer-events-none disabled:opacity-40",
-        size === "lg" ? "px-6 py-4 text-base" : "px-4 py-2.5 text-sm",
+        size === "lg" && "px-6 py-4 text-base",
+        size === "md" && "px-4 py-2.5 text-sm",
+        size === "icon" && "p-1 w-8 h-8",
         variant === "primary" && "bg-primary text-primary-foreground shadow-glow hover:brightness-105",
         variant === "outline" && "border border-border-strong bg-surface text-foreground hover:bg-surface-2",
         variant === "ghost" && "text-muted-foreground hover:text-foreground",
         variant === "quiet" && "bg-surface-2 text-foreground hover:brightness-110",
+        variant === "danger" && "bg-destructive text-destructive-foreground hover:bg-destructive/90",
         className,
       )}
     />
@@ -132,5 +135,64 @@ export function Stat({ value, label }: { value: ReactNode; label: string }) {
       <p className="tabular font-display text-3xl">{value}</p>
       <p className="mt-1 text-xs text-muted-foreground">{label}</p>
     </div>
+  );
+}
+
+type DialogProps = {
+  title: string
+  isOpen: boolean
+  children: ReactNode
+  onClose: () => void
+  className?: string
+}
+
+export function Dialog({ isOpen, onClose, title, children, className }: DialogProps) {
+  const dialogRef = useRef<HTMLDialogElement>(null);
+
+  useEffect(() => {
+    const dialogElement = dialogRef.current;
+    if (!dialogElement) return;
+
+    if (isOpen) {
+      // showModal() opens it as a proper modal with a backdrop and focus trapping
+      if (!dialogElement.open) {
+        dialogElement.showModal();
+      }
+    } else {
+      if (dialogElement.open) {
+        dialogElement.close();
+      }
+    }
+  }, [isOpen]);
+
+  // Handle user clicking the backdrop to close
+  const handleBackdropClick: React.MouseEventHandler<HTMLDialogElement> = (event) => {
+    if (event.target === dialogRef.current) {
+      onClose();
+    }
+  };
+
+  return (
+    <dialog
+      ref={dialogRef}
+      onClose={onClose}
+      onClick={handleBackdropClick}
+      className={cn("w-full max-w-md p-4 border-0 rounded-lg shadow-xl mx-auto my-auto bg-white text-slate-800 backdrop:bg-black/50 backdrop:backdrop-blur-sm", className)}
+    >
+      <div className="flex items-center justify-between mb-4">
+        {title && <h2 className="text-xl font-semibold tracking-tight">{title}</h2>}
+        <button
+          type="button"
+          onClick={onClose}
+          className="text-2xl text-slate-400 hover:text-slate-600 transition-colors p-1 leading-none"
+          aria-label="Close dialog"
+        >
+          &times;
+        </button>
+      </div>
+      <div className="text-sm text-slate-600">
+        {children}
+      </div>
+    </dialog>
   );
 }

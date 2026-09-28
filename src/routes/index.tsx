@@ -8,11 +8,15 @@ import { generateWorkout } from "@/lib/generator";
 import {
   computeStreak,
   todayKey,
-  useActiveSession,
-  useHistory,
-  useProfile,
-  useTodayWorkout,
 } from "@/lib/store";
+import {
+  useActiveSession,
+  useTodayWorkout,
+} from "@/hooks/exercise";
+import {
+  useProfileHistory,
+  useProfile,
+} from "@/hooks/profile";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -36,22 +40,22 @@ export const Route = createFileRoute("/")({
 function Today() {
   const navigate = useNavigate();
   const [profile, , profileLoading] = useProfile();
-  const [history, , historyLoading] = useHistory();
+  const [history] = useProfileHistory();
   const [workout, setWorkout, workoutLoading] = useTodayWorkout();
-  const [active, , activeLoading] = useActiveSession();
+  const [active] = useActiveSession();
 
   useEffect(() => {
-    if (profileLoading || historyLoading) return;
+    if (profileLoading) return;
     if (profile === null && history !== null) navigate({ to: "/onboarding" });
-  }, [profile, history, navigate, profileLoading, historyLoading]);
+  }, [profile, history, navigate, profileLoading]);
 
   useEffect(() => {
-    if (profileLoading || historyLoading || workoutLoading) return;
+    if (profileLoading) return;
     if (!profile || !history) return;
     if (!workout || workout.date !== todayKey()) {
       setWorkout(generateWorkout(profile, history));
     }
-  }, [profile, history, workout, setWorkout, profileLoading, historyLoading, workoutLoading]);
+  }, [profile, history, workout, setWorkout, profileLoading, workoutLoading]);
 
   const streak = useMemo(() => computeStreak(history ?? []), [history]);
   const doneToday = (history ?? []).some((h) => h.date === todayKey());

@@ -39,7 +39,7 @@ export function ExerciseCountdown({ target, unit, onComplete, children }: Exerci
 			return;
 		}
 
-		const timeout = unit === "seconds" ? 1000 : 2200
+		const timeout = unit === "seconds" ? 1000 : 1800
 
 		timerRef.current = setInterval(() => {
 			setTimeLeft((prev) => {

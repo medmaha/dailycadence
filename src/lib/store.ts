@@ -1,33 +1,8 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
-import type { Profile, SessionLog, Workout, ActiveSession } from "./types";
-
-const KEYS = {
-    profile: "cadence.profile.v1",
-    history: "cadence.history.v1",
-    today: "cadence.today.v1",
-    active: "cadence.active.v1",
-};
-
-function read<T>(key: string, fallback: T): T {
-    if (typeof window === "undefined") return fallback;
-    try {
-        const raw = window.localStorage.getItem(key);
-        return raw ? (JSON.parse(raw) as T) : fallback;
-    } catch {
-        return fallback;
-    }
-}
-
-function write(key: string, value: unknown) {
-    if (typeof window === "undefined") return;
-    try {
-        window.localStorage.setItem(key, JSON.stringify(value));
-    } catch {
-        /* storage full or blocked */
-    }
-    window.dispatchEvent(new CustomEvent("cadence:store", { detail: key }));
-}
+import type { SessionLog } from "./types";
+import { useProfileStore } from "@/stores/profileStore";
+import { useExerciseStore } from "@/stores/exerciseStore";
 
 export function todayKey(d = new Date()) {
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
@@ -41,85 +16,27 @@ export function daysBetween(a: string, b: string) {
     return Math.round((db - da) / 86_400_000);
 }
 
-/** Reactive localStorage-backed value. Returns [value, setValue, isLoading] tuple. */
-function usePersisted<T>(key: string, fallback: T) {
-    const [value, setValue] = useState<T | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
-
-    useEffect(() => {
-        setValue(read<T>(key, fallback));
-        setIsLoading(false);
-        const sync = (e: Event) => {
-            const detail = (e as CustomEvent).detail;
-            if (detail === undefined || detail === key) setValue(read<T>(key, fallback));
-        };
-        window.addEventListener("cadence:store", sync);
-        window.addEventListener("storage", sync);
-        return () => {
-            window.removeEventListener("cadence:store", sync);
-            window.removeEventListener("storage", sync);
-        };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [key]);
-
-    const set = useCallback(
-        (next: T | null) => {
-            if (next === null) {
-                window.localStorage.removeItem(key);
-                window.dispatchEvent(new CustomEvent("cadence:store", { detail: key }));
-                setValue(fallback);
-                return;
-            }
-            write(key, next);
-            setValue(next);
-        },
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        [key],
-    );
-
-    return [value, set, isLoading] as const;
-}
-
-export function useProfile() {
-    return usePersisted<Profile | null>(KEYS.profile, null);
-}
-
-export function useHistory() {
-    return usePersisted<SessionLog[]>(KEYS.history, []);
-}
-
-export function useTodayWorkout() {
-    return usePersisted<Workout | null>(KEYS.today, null);
-}
-
-export function useActiveSession() {
-    return usePersisted<ActiveSession | null>(KEYS.active, null);
-}
-
 export function getHistory() {
-    return read<SessionLog[]>(KEYS.history, []);
+    return useExerciseStore.getState().history
 }
 
 export function getProfile() {
-    return read<Profile | null>(KEYS.profile, null);
+    return useProfileStore.getState().profile
 }
 
 export function saveSession(log: SessionLog) {
-    const history = getHistory().filter((s) => s.id !== log.id);
-    write(KEYS.history, [log, ...history].slice(0, 400));
+    useExerciseStore.getState().updateHistory(log)
 }
 
 export function clearToday() {
-    if (typeof window === "undefined") return;
-    window.localStorage.removeItem(KEYS.today);
-    window.localStorage.removeItem(KEYS.active);
-    window.dispatchEvent(new CustomEvent("cadence:store"));
+    useExerciseStore.getState().setToday(null)
+    useExerciseStore.getState().setActive(null)
 }
 
 export function resetAll() {
-    if (typeof window === "undefined") return;
-    Object.values(KEYS).forEach((k) => window.localStorage.removeItem(k));
-    window.dispatchEvent(new CustomEvent("cadence:store"));
+    clearToday()
+    useProfileStore.getState().updateProfile(null)
+    useExerciseStore.getState().updateHistory(null)
 }
 
 /** Consecutive-day streak ending today or yesterday. */

@@ -11,9 +11,6 @@ import { useRef, useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { setupServiceWorker } from "../lib/pwa";
-import { initNotificationSettings } from "@/lib/push-notification";
-import { initRingtoneSettings } from "@/lib/audioManager";
-import { initExerciseReminderSettings } from "@/lib/reminders";
 
 declare global {
   interface Window {
@@ -84,6 +81,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
 }
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
+  // ssr: false,
   head: () => ({
     meta: [
       { charSet: "utf-8" },
@@ -141,9 +139,17 @@ function RootComponent() {
       loaded.current = true
       void setupServiceWorker();
     }
-    initRingtoneSettings()
-    initNotificationSettings()
-    initExerciseReminderSettings()
+    return () => {
+      const deviceId = localStorage.getItem("cadence.device.v1")
+      if (!deviceId) {
+        const deviceId = crypto.randomUUID().replace(/-/gi, "").toUpperCase()
+        localStorage.setItem("cadence.device.v1", deviceId)
+      }
+      const dateJoined = localStorage.getItem("cadence.joinedAt.v1")
+      if (!dateJoined) {
+        localStorage.setItem("cadence.joinedAt.v1", Date.now().toString())
+      }
+    }
   }, []);
 
   return (

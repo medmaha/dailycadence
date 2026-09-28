@@ -4,7 +4,9 @@ import { Card, Eyebrow, Screen } from "@/components/ui-kit";
 import { ReminderSettings } from "@/components/ReminderSettings";
 import { ProfileSettings } from "@/components/ProfileSettings";
 import { SettingsActions } from "@/components/SettingsActions";
-import { clearToday, resetAll, useProfile } from "@/lib/store";
+import { clearToday, resetAll } from "@/lib/store";
+import { useProfile } from "@/hooks/profile";
+import { RingtoneManager } from "@/components/RingtoneManager";
 
 export const Route = createFileRoute("/settings")({
   head: () => ({
@@ -46,7 +48,7 @@ function Settings() {
       <header className="animate-rise">
         <Eyebrow>Setup</Eyebrow>
         <h1 className="mt-2 text-4xl font-semibold">Your training inputs</h1>
-        <p className="mt-3 text-sm text-muted-foreground">
+        <p className="my-3 text-sm text-muted-foreground">
           Change anything - the next session is rebuilt from it.
         </p>
       </header>
@@ -62,6 +64,8 @@ function Settings() {
       <Card className="mt-6 animate-rise">
         <ReminderSettings />
       </Card>
+
+      <RingtoneManager />
 
       <SettingsActions
         onRunSetup={() => navigate({ to: "/onboarding" })}

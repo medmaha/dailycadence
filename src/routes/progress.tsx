@@ -3,7 +3,8 @@ import { useMemo } from "react";
 
 import { Card, Eyebrow, Screen, Stat } from "@/components/ui-kit";
 import { REGION_LABEL } from "@/lib/exercises";
-import { computeStreak, daysBetween, todayKey, useHistory } from "@/lib/store";
+import { computeStreak, daysBetween, todayKey } from "@/lib/store";
+import { useProfileHistory } from "@/hooks/profile";
 import { Region } from "@/lib/types";
 
 export const Route = createFileRoute("/progress")({
@@ -27,7 +28,7 @@ export const Route = createFileRoute("/progress")({
 const REGIONS: Region[] = ["push", "pull", "legs", "core", "mobility", "cardio"];
 
 function Progress() {
-  const [history, , historyLoading] = useHistory();
+  const [history, , historyLoading] = useProfileHistory();
   const sessions = history ?? [];
 
   const streak = useMemo(() => computeStreak(sessions), [sessions]);

@@ -1,7 +1,7 @@
-/**
- * Audio manager for ringtone handling
- * Handles audio upload, compression, and storage for custom ringtones
- */
+
+import { STORAGE_KEYS } from "@/stores/keys";
+import { capitalizeText, randomUUID } from "./utils";
+import { useRingtoneStore } from "@/stores/ringtoneStore";
 
 export interface Ringtone {
   id: string;
@@ -11,8 +11,6 @@ export interface Ringtone {
   createdAt: number;
 }
 
-const RINGTONES_KEY = 'cadence.ringtones.v1';
-const SOUND_ENABLED_KEY = 'cadence.sound_enabled.v1';
 const DEFAULT_RINGTONE: Ringtone = {
   id: 'default',
   name: 'Default',
@@ -28,58 +26,29 @@ const MAX_COMPRESSED_SIZE = 100 * 1024; // 100KB after compression
 
 export function initRingtoneSettings() {
   try {
-    window._RINGTONES_KEY = RINGTONES_KEY
-    window._SOUND_ENABLED_KEY = SOUND_ENABLED_KEY
+    window._RINGTONES_KEY = STORAGE_KEYS.RINGTONES
     window._DEFAULT_RINGTONE = DEFAULT_RINGTONE
   } catch (error) {
     console.error(error)
   }
 }
 
-export async function requestAudioPermission(): Promise<boolean> {
+export async function requestSpeakerPermission(): Promise<boolean> {
   return new Promise<boolean>(r => {
-    navigator.mediaDevices
-      .getUserMedia({ audio: true, video: false })
-      .then(function (stream) {
-        r(true)
-      })
-      .catch(function (err) {
-        console.error("Audio permission denied or error occurred: ", err);
-        r(false)
-      });
+    // TODO
+    r(true)
   })
 }
-
 
 /**
  * Get all saved ringtones from localStorage
  */
 export function getRingtones(): Ringtone[] {
-  if (typeof window === 'undefined') return [DEFAULT_RINGTONE];
-
-  try {
-    const stored = localStorage.getItem(RINGTONES_KEY);
-    const customRingtones: Ringtone[] = stored ? JSON.parse(stored) : [];
-    requestAudioPermission().catch(console.error)
-    return [DEFAULT_RINGTONE, ...customRingtones];
-  } catch {
-    return [DEFAULT_RINGTONE];
+  const ringtones = useRingtoneStore.getState().ringtones.filter(r => !r.isDefault)
+  if (ringtones.length === 0) {
+    return [DEFAULT_RINGTONE]
   }
-}
-
-/**
- * Save custom ringtones to localStorage
- */
-function saveCustomRingtones(ringtones: Ringtone[]): void {
-  if (typeof window === 'undefined') return;
-
-  try {
-    // Filter out default ringtone before saving
-    const customOnly = ringtones.filter(r => !r.isDefault);
-    localStorage.setItem(RINGTONES_KEY, JSON.stringify(customOnly));
-  } catch (error) {
-    console.error('Failed to save ringtones:', error);
-  }
+  return ringtones
 }
 
 /**
@@ -88,33 +57,17 @@ function saveCustomRingtones(ringtones: Ringtone[]): void {
 export function deleteRingtone(id: string): void {
   const ringtones = getRingtones();
   const filtered = ringtones.filter(r => r.id !== id);
-  saveCustomRingtones(filtered);
+  saveRingtones(filtered);
 }
 
 /**
- * Check if sound is enabled
+ * Save custom ringtones to localStorage
  */
-export function isSoundEnabled(): boolean {
-  if (typeof window === 'undefined') return true;
-
+function saveRingtones(ringtones: Ringtone[]): void {
   try {
-    const stored = localStorage.getItem(SOUND_ENABLED_KEY);
-    return stored === null ? true : stored === 'true';
-  } catch {
-    return true;
-  }
-}
-
-/**
- * Set sound enabled state
- */
-export function setSoundEnabled(enabled: boolean): void {
-  if (typeof window === 'undefined') return;
-
-  try {
-    localStorage.setItem(SOUND_ENABLED_KEY, String(enabled));
+    useRingtoneStore.getState().setRingtones(ringtones)
   } catch (error) {
-    console.error('Failed to save sound setting:', error);
+    console.error('Failed to save ringtones:', error);
   }
 }
 
@@ -246,14 +199,19 @@ function fileToDataUrl(file: File): Promise<string> {
  * Upload and process custom ringtone
  */
 export async function uploadRingtone(file: File): Promise<Ringtone> {
-  // Validate file size
-  if (file.size > MAX_FILE_SIZE) {
-    throw new Error(`File size must be less than ${MAX_FILE_SIZE / 1024}KB`);
-  }
+  try {
+    // Validate file size
+    if (file.size > MAX_FILE_SIZE) {
+      throw new Error(`File size must be less than ${MAX_FILE_SIZE / 1024}KB`);
+    }
 
-  // Validate file type
-  if (!file.type.startsWith('audio/')) {
-    throw new Error('File must be an audio file');
+    // Validate file type
+    if (!file.type.startsWith('audio/')) {
+      throw new Error('File must be an audio file');
+    }
+  } catch (error: any) {
+    alert(error.message)
+    throw error
   }
 
   // Get current ringtones
@@ -261,7 +219,9 @@ export async function uploadRingtone(file: File): Promise<Ringtone> {
   const customCount = ringtones.filter(r => !r.isDefault).length;
 
   if (customCount >= MAX_CUSTOM_RINGTONES) {
-    throw new Error(`Maximum ${MAX_CUSTOM_RINGTONES} custom ringtones allowed`);
+    const msg = `Maximum ${MAX_CUSTOM_RINGTONES} custom ringtones allowed`
+    alert(msg)
+    throw new Error(msg);
   }
 
   try {
@@ -274,39 +234,40 @@ export async function uploadRingtone(file: File): Promise<Ringtone> {
     );
 
     // Create ringtone object
+    const filename = file.name.replace(/\.[^/.]+$/, '')
     const newRingtone: Ringtone = {
-      id: crypto.randomUUID().replace("-", "").substring(0, 10),
-      name: file.name.replace(/\.[^/.]+$/, ''), // Remove extension
+      id: randomUUID(),
+      name: capitalizeText(filename), // Remove extension
       dataUrl,
       isDefault: false,
       createdAt: Date.now(),
     };
 
-    // Save to localStorage
-    saveCustomRingtones([...ringtones.filter(r => !r.isDefault), newRingtone]);
+    saveRingtones([...ringtones, newRingtone]);
 
     return newRingtone;
   } catch (error) {
-    console.error('Failed to process ringtone:', error);
     throw new Error('Failed to process audio file');
   }
-}
-
-export function getRingtoneById(id?: string) {
-  if (!id) return null
-  return getRingtones().find(r => r.id === id) || null
 }
 
 /**
  * Play a ringtone for testing
  */
 export async function playRingtone(ringtone_id?: string) {
+  let ringtone
   try {
-    if (!isSoundEnabled()) return;
-    const ringtone = (getRingtoneById(ringtone_id)) || DEFAULT_RINGTONE
-    const audio = new Audio(ringtone.dataUrl);
-    await audio.play()
+    if (!useRingtoneStore.getState().isSoundEnabled()) return;
+    const ringtones = getRingtones();
+    ringtone = ringtones.find(r => r.id === ringtone_id) || ringtones[0];
+    if (ringtone) {
+      const audio = new Audio(ringtone.dataUrl);
+      await audio.play();
+    }
   } catch (error) {
-    console.error(error)
+    console.error(error);
+    if (ringtone && !ringtone.isDefault) {
+      alert("Failed to play your custom ringtone")
+    }
   }
 }

@@ -1,4 +1,7 @@
-import { areNotificationsEnabled, showNotification } from "./push-notification";
+import { STORAGE_KEYS } from "@/stores/keys";
+import { showNotification } from "./push-notification";
+import { useReminderStore } from "@/stores/reminderStore";
+import { usePushNotificationStore } from "@/stores/notificationStore";
 
 export interface Reminder {
   id: string;
@@ -9,42 +12,21 @@ export interface Reminder {
   ringtoneId?: string
 }
 
-const REMINDERS_KEY = 'cadence.reminders.v1';
-
-/**
- * Request notification permission from the user
-*/
-
-export function initExerciseReminderSettings() {
+export function initReminderSettings() {
   try {
-    window._REMINDERS_KEY = REMINDERS_KEY
+    window._REMINDERS_KEY = STORAGE_KEYS.REMINDERS
   } catch (error) {
     console.error(error)
   }
 }
 
 /**
- * Save reminders to localStorage
- */
-function saveReminders(reminders: Reminder[]): void {
-  if (typeof window === 'undefined') return;
-
-  try {
-    localStorage.setItem(REMINDERS_KEY, JSON.stringify(reminders));
-  } catch (error) {
-    console.error('Failed to save reminders:', error);
-  }
-}
-
-/**
- * Get all saved reminders from localStorage
+ * Get all saved reminders
  */
 export function getReminders(): Reminder[] {
   if (typeof window === 'undefined') return [];
-
   try {
-    const stored = localStorage.getItem(REMINDERS_KEY);
-    return stored ? JSON.parse(stored) : [];
+    return useReminderStore.getState().reminders
   } catch {
     return [];
   }
@@ -57,7 +39,7 @@ export function addReminder(reminder: Omit<Reminder, 'id'>): Reminder {
   const reminders = getReminders();
   const newReminder: Reminder = {
     ...reminder,
-    id: crypto.randomUUID().replace("-", '').substring(0, 10),
+    id: crypto.randomUUID().replace(/-/gi, '').substring(0, 10).toUpperCase(),
   };
   saveReminders([...reminders, newReminder]);
   return newReminder;
@@ -81,6 +63,14 @@ export function deleteReminder(id: string): void {
 }
 
 
+function saveReminders(reminders: Reminder[]): void {
+  try {
+    useReminderStore.getState().setReminders(reminders)
+  } catch (error) {
+    console.error('Failed to save reminders:', error);
+  }
+}
+
 let reminderCheckInterval: number | null = null;
 
 /**
@@ -89,8 +79,8 @@ let reminderCheckInterval: number | null = null;
  */
 export function startReminderChecks(): void {
   if (reminderCheckInterval !== null) return;
-  const enabled = !areNotificationsEnabled()
-  if (enabled) return;
+  const enabled = usePushNotificationStore.getState().isNotificationsEnabled()
+  if (!enabled) return;
 
   // Check every minute
   reminderCheckInterval = window.setInterval(() => {
@@ -138,6 +128,6 @@ function shouldTriggerReminder(reminder: Reminder): boolean {
  */
 function parseTime(time: string): { hours: number; minutes: number } {
   const [hours, minutes] = time.split(':').map(Number);
-  if (!hours || !minutes) throw new Error("Invalid Time");
+  if (hours === undefined || minutes === undefined) throw new Error("Invalid Time: " + time);
   return { hours, minutes };
 }

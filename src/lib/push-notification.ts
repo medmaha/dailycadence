@@ -1,25 +1,19 @@
-/**
- * Notification service for PWA push notifications
- * Handles permission requests, notification scheduling, and reminder management
- */
-
-import { getRingtoneById } from "./audioManager";
+import { useRingtoneStore } from "@/stores/ringtoneStore";
+import { getRingtones } from "./ringtones";
 import type { Reminder } from "./reminders";
+import { usePushNotificationStore } from "@/stores/notificationStore";
 
-const REMINDERS_KEY = 'cadence.reminders.v1';
-
-/**
- * Request notification permission from the user
-*/
 
 export function initNotificationSettings() {
   try {
-    window._REMINDERS_KEY = REMINDERS_KEY
   } catch (error) {
     console.error(error)
   }
 }
 
+/**
+ * Request notification permission from the user
+*/
 export async function requestNotificationPermission(): Promise<boolean> {
 
   if (!('Notification' in window)) {
@@ -39,30 +33,30 @@ export async function requestNotificationPermission(): Promise<boolean> {
   return false;
 }
 
-/**
- * Check if notifications are supported and permission is granted
- */
-export function areNotificationsEnabled(): boolean {
-  return 'Notification' in window && Notification.permission === 'granted';
-}
 
 /**
  * Show a local notification immediately
  */
 export function showNotification(title: string, reminder: Reminder, options?: NotificationOptions): void {
-  if (!areNotificationsEnabled()) return;
+  if (!usePushNotificationStore.getState().isNotificationsEnabled()) return;
 
   try {
+    // Play ringtone if sound is enabled
+    if (useRingtoneStore.getState().isSoundEnabled()) {
+      const ringtones = getRingtones();
+      const ringtone = ringtones.find(r => r.id === reminder.ringtoneId) || ringtones[0];
+      if (ringtone) {
+        const audio = new Audio(ringtone.dataUrl);
+        audio.play().catch(console.error);
+      }
+    }
+
     new Notification(title, {
       icon: '/icon-192.png',
       badge: '/icon-192.png',
       tag: reminder.id,
       body: reminder.message,
       ...options,
-      data: {
-        ...(options?.data || {}),
-        ringtone: getRingtoneById(reminder.ringtoneId)
-      }
     });
   } catch (error) {
     console.error('Failed to show notification:', error);

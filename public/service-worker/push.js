@@ -6,8 +6,10 @@ self.addEventListener('push', (event) => {
     try {
       const data = event.data.json();
       const { title, body, icon, data:payload, ...rest } = data;
-      if (payload.ringtone){
+      console.debug("received push", title, body)
+      if (payload?.ringtone){
         playRingtone(payload.ringtone)
+        console.debug("received ringtone", payload.ringtone)
       }
       event.waitUntil(
         self.registration.showNotification(title, {
@@ -36,13 +38,19 @@ self.addEventListener('push', (event) => {
 // Handle notification clicks
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
+  const audio = window._CURRENT_AUDIO
+  if (audio){
+    audio.pause()
+    audio.remove()
+    window._CURRENT_AUDIO = null
+  }
   // Open the app or a specific URL
   event.waitUntil(
     clients.openWindow(self.location.origin)
   );
 });
 
-export function isSoundEnabled() {
+function isSoundEnabled() {
   try {
     const stored = localStorage.getItem(SOUND_ENABLED_KEY);
     return stored === null ? true : stored === 'true';
@@ -51,11 +59,13 @@ export function isSoundEnabled() {
   }
 }
 
-export async function playRingtone(ring) {
+
+async function playRingtone(ring) {
   try {
     if (!isSoundEnabled()) return;
     const ringtone = ring || window._DEFAULT_RINGTONE
     const audio = new Audio(ringtone.dataUrl);
+    window._CURRENT_AUDIO = audio
     await audio.play()
   } catch (error) {
     console.error(error)
