@@ -14,6 +14,8 @@ import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as ProgressRouteImport } from './routes/progress'
 import { Route as SessionRouteImport } from './routes/session'
 import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as ApiCronRemindersRouteImport } from './routes/api/cron/reminders'
+import { Route as ApiHealthIndexRouteImport } from './routes/api/health/index'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -40,6 +42,16 @@ const SettingsRoute = SettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiCronRemindersRoute = ApiCronRemindersRouteImport.update({
+  id: '/api/cron/reminders',
+  path: '/api/cron/reminders',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiHealthIndexRoute = ApiHealthIndexRouteImport.update({
+  id: '/api/health/',
+  path: '/api/health/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -47,6 +59,8 @@ export interface FileRoutesByFullPath {
   '/progress': typeof ProgressRoute
   '/session': typeof SessionRoute
   '/settings': typeof SettingsRoute
+  '/api/cron/reminders': typeof ApiCronRemindersRoute
+  '/api/health/': typeof ApiHealthIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -54,6 +68,8 @@ export interface FileRoutesByTo {
   '/progress': typeof ProgressRoute
   '/session': typeof SessionRoute
   '/settings': typeof SettingsRoute
+  '/api/cron/reminders': typeof ApiCronRemindersRoute
+  '/api/health': typeof ApiHealthIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -62,13 +78,37 @@ export interface FileRoutesById {
   '/progress': typeof ProgressRoute
   '/session': typeof SessionRoute
   '/settings': typeof SettingsRoute
+  '/api/cron/reminders': typeof ApiCronRemindersRoute
+  '/api/health/': typeof ApiHealthIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/onboarding' | '/progress' | '/session' | '/settings'
+  fullPaths:
+    | '/'
+    | '/onboarding'
+    | '/progress'
+    | '/session'
+    | '/settings'
+    | '/api/cron/reminders'
+    | '/api/health/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/onboarding' | '/progress' | '/session' | '/settings'
-  id: '__root__' | '/' | '/onboarding' | '/progress' | '/session' | '/settings'
+  to:
+    | '/'
+    | '/onboarding'
+    | '/progress'
+    | '/session'
+    | '/settings'
+    | '/api/cron/reminders'
+    | '/api/health'
+  id:
+    | '__root__'
+    | '/'
+    | '/onboarding'
+    | '/progress'
+    | '/session'
+    | '/settings'
+    | '/api/cron/reminders'
+    | '/api/health/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -77,6 +117,8 @@ export interface RootRouteChildren {
   ProgressRoute: typeof ProgressRoute
   SessionRoute: typeof SessionRoute
   SettingsRoute: typeof SettingsRoute
+  ApiCronRemindersRoute: typeof ApiCronRemindersRoute
+  ApiHealthIndexRoute: typeof ApiHealthIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -116,6 +158,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SettingsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/cron/reminders': {
+      id: '/api/cron/reminders'
+      path: '/api/cron/reminders'
+      fullPath: '/api/cron/reminders'
+      preLoaderRoute: typeof ApiCronRemindersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/health/': {
+      id: '/api/health/'
+      path: '/api/health'
+      fullPath: '/api/health/'
+      preLoaderRoute: typeof ApiHealthIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -125,6 +181,8 @@ const rootRouteChildren: RootRouteChildren = {
   ProgressRoute: ProgressRoute,
   SessionRoute: SessionRoute,
   SettingsRoute: SettingsRoute,
+  ApiCronRemindersRoute: ApiCronRemindersRoute,
+  ApiHealthIndexRoute: ApiHealthIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
