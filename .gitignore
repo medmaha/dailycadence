@@ -13,7 +13,7 @@ dev-dist
 dist-ssr
 .output
 .vinxi
-.tanstack/**
+.tanstack
 .nitro
 *.local
 
@@ -22,8 +22,7 @@ dist-ssr
 .dev.vars
 
 # Editor directories and files
-.vscode/*
-!.vscode/extensions.json
+.vscode
 .idea
 .DS_Store
 *.suo
@@ -32,3 +31,7 @@ dist-ssr
 *.sln
 *.sw?
 .vercel
+.env
+
+# certs
+*.pem

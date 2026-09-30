@@ -1,58 +1,65 @@
-import * as fs from "node:fs";
+import fs from "node:fs";
 import path from "node:path";
 import type { Plugin } from "vite";
 import { generateSW } from "workbox-build";
 
 export function cadencePwaPlugin(): Plugin {
-    let rootDir: string;
-    let isProduction: boolean;
-
+    let resolvedConfig: any;
     return {
         name: "cadence-pwa",
         configResolved(config) {
-            rootDir = config.root;
-            isProduction = config.isProduction;
+            resolvedConfig = config;
         },
-
-        async configureServer(server) {
-            if (isProduction || !server) return;
-            const outDir = path.resolve(rootDir, "public")
-            const swDest = path.join(outDir, "sw.js");
-            await makeBuild({ swDest, outDir, mode: "development" })
+        async buildStart() {
+            if (resolvedConfig.command === "serve") {
+                const outDir = path.resolve(resolvedConfig.root, resolvedConfig.publicDir);
+                const swDest = path.join(outDir, "sw.js");
+                await makeBuild({ swDest, outDir });
+            }
         },
+        async writeBundle(options) {
+            if (resolvedConfig.command === "build" && options.dir && options.dir.endsWith("client")) {
+                const outDir = options.dir;
+                const swDest = path.join(outDir, "sw.js");
+                await makeBuild({ swDest, outDir });
+            }
+        },
+    };
+}
 
-        async closeBundle(error) {
-            if (!isProduction || error) return;
-
-            const outDir = path.resolve(rootDir, "dist", "client")
-            const swDest = path.join(outDir, "sw.js");
-            await makeBuild({ swDest, outDir })
-
-            // remove the precache workbox file
-            const publicDir = path.resolve(rootDir, "public")
-            fs.readdirSync(publicDir).find(file => {
-                if (file.startsWith("workbox-") || file == "sw.js") {
-                    fs.unlinkSync(path.resolve(publicDir, file))
-                }
-            })
-
-        }
-    }
-};
-
-
-async function makeBuild({ swDest, outDir, mode = "production", }: { mode?: "production" | "development", outDir: string, swDest: string }) {
+async function makeBuild({ swDest, outDir }: { outDir: string; swDest: string }) {
     try {
+        const routesDir = path.resolve(process.cwd(), "src/routes");
+        let additionalManifestEntries: { url: string; revision: string }[] = [];
+        if (fs.existsSync(routesDir)) {
+            const routeFiles = fs.readdirSync(routesDir).filter(f => f.endsWith('.tsx') && !f.startsWith('__'));
+            for (const route of routeFiles) {
+                const revision = String(Date.now());
+                let url
+                if (route === 'index.tsx') {
+                    url = "/"
+                } else {
+                    url = `/${route.replace('.tsx', '')}`
+                }
+                additionalManifestEntries.push({
+                    url,
+                    revision
+                })
+            }
+        }
+
+        console.log(`ℹ️ Building service-worker in ${swDest}`);
         const { count, size, warnings } = await generateSW({
-            mode,
             swDest,
             sourcemap: false,
             globDirectory: outDir,
-            globPatterns: ["**/*.{js,css,html,png,svg,ico,woff2,webmanifest}"],
+            globPatterns: ["**/*.{js,css,html,png,svg,ico,woff2,webmanifest,mp3}"],
+            additionalManifestEntries,
             importScripts: [
-                "/service-worker/push.js",
-                "/service-worker/reminder.js",
-                "/service-worker/assets-loader.js",
+                "./service-worker/push.js",
+                // "./service-worker/reminder.js",
+                // "./service-worker/assets-loader.js",
+                "https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js",
             ],
             navigateFallback: null,
             cleanupOutdatedCaches: true,
@@ -74,13 +81,20 @@ async function makeBuild({ swDest, outDir, mode = "production", }: { mode?: "pro
                     handler: "StaleWhileRevalidate",
                     options: { cacheName: "fonts" },
                 },
+                {
+                    urlPattern: ({ sameOrigin }) => sameOrigin,
+                    handler: "StaleWhileRevalidate",
+                    options: { cacheName: "app-assets" },
+                },
             ],
         });
 
         if (warnings.length) console.warn("[PWA] warnings:", warnings);
-        console.log(`✅ [PWA] Pre-cached ${count} files (${(size / 1024 / 1024).toFixed(2)} MB)`);
+        console.log(
+            `✅ [PWA] ServiceWorker Pre-cached ${count} files (${(size / 1024 / 1024).toFixed(2)} MB)`,
+        );
     } catch (err) {
-        console.error("❌ [PWA] Failed to generate service worker:", err);
+        console.error("❌ [PWA] Failed while generating service-worker file:", err);
         throw err;
     }
 }
