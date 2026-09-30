@@ -3,7 +3,6 @@ import { getAssetUrl } from "@bryllim/workout-guide";
 
 import { cn } from "@/lib/utils";
 
-
 interface ExerciseAnimationProps {
     exerciseId: string;
     className?: string;
@@ -13,7 +12,7 @@ interface ExerciseAnimationProps {
 
 /** Returns the animation slug for an exercise, or null if unmapped. */
 export function getAnimationSlug(exerciseId: string): string {
-    return exerciseId
+    return exerciseId;
 }
 
 /**

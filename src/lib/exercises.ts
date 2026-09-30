@@ -13,7 +13,6 @@ export const REGION_LABEL: Record<Region, string> = {
     cardio: "Conditioning", // Conditioning exercises
 };
 
-
 /**
  * Checks if an exercise is available based on the user's equipment.
  * @param ex - The exercise to check.

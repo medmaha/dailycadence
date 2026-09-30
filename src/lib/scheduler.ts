@@ -73,7 +73,11 @@ export async function flushPendingSchedules(): Promise<void> {
     flushing = true;
     try {
         const pending = await loadPending();
-        if (pending.size && !confirm("There are queued reminders while offline. Do you want to sync them now?")) return
+        if (
+            pending.size &&
+            !confirm("There are queued reminders while offline. Do you want to sync them now?")
+        )
+            return;
 
         for (const id of pending) {
             // always use the latest version of the reminder

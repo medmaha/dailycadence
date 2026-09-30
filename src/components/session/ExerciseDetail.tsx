@@ -65,7 +65,10 @@ export function ExerciseDetail({
                 <p className="mt-4 text-sm text-muted-foreground">{exercise.cue}</p>
 
                 <div className="mt-2">
-                    <ExerciseAnimation exerciseId={exercise.imageName} className="mx-auto max-w-50" />
+                    <ExerciseAnimation
+                        exerciseId={exercise.imageName}
+                        className="mx-auto max-w-50"
+                    />
                 </div>
 
                 <div className="mt-4">

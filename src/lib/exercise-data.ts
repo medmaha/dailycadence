@@ -998,7 +998,6 @@ export const EXERCISES: Exercise[] = [
  */
 export const EXERCISE_BY_ID = new Map(EXERCISES.map((e) => [e.id, e]));
 
-
 /**
  * Dev-time check. Pass the slugs that actually exist in your animation
  * library to catch any imageName that doesn't resolve, plus duplicate ids.

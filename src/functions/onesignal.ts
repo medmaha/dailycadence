@@ -91,8 +91,8 @@ export const scheduleReminder = createServerFn()
 
 export const cancelNotification = createServerFn()
     .validator((data: unknown) => {
-        if (typeof data !== 'string') {
-            throw new Error('Invalid input: expected string');
+        if (typeof data !== "string") {
+            throw new Error("Invalid input: expected string");
         }
         return data;
     })

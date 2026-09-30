@@ -164,7 +164,7 @@ function RootComponent() {
     return (
         <QueryClientProvider client={queryClient}>
             <Outlet />
-            <StartReminderChecks/>
+            <StartReminderChecks />
             <NotificationSound />
         </QueryClientProvider>
     );
