@@ -1,10 +1,16 @@
 import { Exercise } from "./types";
 
+/**
+ * Entries marked "fallback" reuse a similar movement because no exact
+ * animation exists. Several exercises can share one imageName, which is
+ * why ids are kept stable instead of being renamed to match.
+ */
 export const EXERCISES: Exercise[] = [
     // ---- push
     {
         id: "pushup",
         name: "Push-up",
+        imageName: "push-up",
         region: "push",
         equipment: "none",
         intensity: 2,
@@ -15,6 +21,7 @@ export const EXERCISES: Exercise[] = [
     {
         id: "incline-pushup",
         name: "Incline push-up",
+        imageName: "incline-push-up",
         region: "push",
         equipment: "none",
         intensity: 1,
@@ -25,6 +32,7 @@ export const EXERCISES: Exercise[] = [
     {
         id: "tempo-pushup",
         name: "Tempo push-up",
+        imageName: "push-up", // fallback
         region: "push",
         equipment: "none",
         intensity: 3,
@@ -35,6 +43,7 @@ export const EXERCISES: Exercise[] = [
     {
         id: "pike-pushup",
         name: "Pike push-up",
+        imageName: "pike-push-up",
         region: "push",
         equipment: "none",
         intensity: 3,
@@ -45,6 +54,7 @@ export const EXERCISES: Exercise[] = [
     {
         id: "dips-chair",
         name: "Bench dip",
+        imageName: "bench-dip",
         region: "push",
         equipment: "none",
         intensity: 2,
@@ -55,6 +65,7 @@ export const EXERCISES: Exercise[] = [
     {
         id: "db-press",
         name: "Dumbbell floor press",
+        imageName: "dumbbell-bench-press",
         region: "push",
         equipment: "dumbbells",
         intensity: 2,
@@ -65,6 +76,7 @@ export const EXERCISES: Exercise[] = [
     {
         id: "db-overhead",
         name: "Dumbbell overhead press",
+        imageName: "standing-dumbbell-press",
         region: "push",
         equipment: "dumbbells",
         intensity: 3,
@@ -75,6 +87,7 @@ export const EXERCISES: Exercise[] = [
     {
         id: "band-press",
         name: "Band chest press",
+        imageName: "dumbbell-bench-press", // fallback
         region: "push",
         equipment: "bands",
         intensity: 2,
@@ -85,6 +98,7 @@ export const EXERCISES: Exercise[] = [
     {
         id: "diamond-pushup",
         name: "Diamond push-up",
+        imageName: "diamond-push-up",
         region: "push",
         equipment: "none",
         intensity: 3,
@@ -95,6 +109,7 @@ export const EXERCISES: Exercise[] = [
     {
         id: "db-lateral-raise",
         name: "Dumbbell lateral raise",
+        imageName: "lateral-raise",
         region: "push",
         equipment: "dumbbells",
         intensity: 2,
@@ -105,6 +120,7 @@ export const EXERCISES: Exercise[] = [
     {
         id: "band-overhead-press",
         name: "Band overhead press",
+        imageName: "overhead-press", // fallback
         region: "push",
         equipment: "bands",
         intensity: 2,
@@ -112,10 +128,46 @@ export const EXERCISES: Exercise[] = [
         unit: "reps",
         cue: "Stand on the middle of the band and hold the handles at shoulder height. Brace your core and squeeze your glutes. Press straight overhead without arching your lower back, then lower with control.",
     },
+    // new
+    {
+        id: "wide-pushup",
+        name: "Wide push-up",
+        imageName: "push-up", // fallback
+        region: "push",
+        equipment: "none",
+        intensity: 2,
+        minLevel: 0,
+        unit: "reps",
+        cue: "Set hands wider than shoulder width in a straight plank. Brace your core and lower your chest between your hands, keeping elbows at about 45° to 60°. Press the floor away to return without letting hips sag.",
+    },
+    {
+        id: "decline-pushup",
+        name: "Decline push-up",
+        imageName: "push-up", // fallback
+        region: "push",
+        equipment: "none",
+        intensity: 3,
+        minLevel: 1,
+        unit: "reps",
+        cue: "Place your feet on a stable chair or step with hands on the floor under your shoulders. Brace your core and lower your chest with elbows about 45°. Press back up while keeping your body in one straight line.",
+    },
+    {
+        id: "band-lateral-raise",
+        name: "Band lateral raise",
+        imageName: "lateral-raise", // fallback
+        region: "push",
+        equipment: "bands",
+        intensity: 1,
+        minLevel: 0,
+        unit: "reps",
+        cue: "Stand on the band and hold the handles at your sides with a slight elbow bend. Raise your arms outward to shoulder height, leading with the elbows. Keep shoulders relaxed and lower slowly against the tension.",
+    },
+
     // ---- pull
     {
         id: "band-row",
         name: "Band row",
+        imageName: "banded-row",
         region: "pull",
         equipment: "bands",
         intensity: 2,
@@ -126,6 +178,7 @@ export const EXERCISES: Exercise[] = [
     {
         id: "band-pulldown",
         name: "Band pulldown",
+        imageName: "banded-lat-pulldown",
         region: "pull",
         equipment: "bands",
         intensity: 2,
@@ -136,6 +189,7 @@ export const EXERCISES: Exercise[] = [
     {
         id: "db-row",
         name: "Dumbbell single-arm row",
+        imageName: "one-arm-dumbbell-row",
         region: "pull",
         equipment: "dumbbells",
         intensity: 2,
@@ -146,6 +200,7 @@ export const EXERCISES: Exercise[] = [
     {
         id: "db-pullover",
         name: "Dumbbell pullover",
+        imageName: "straight-arm-pulldown", // fallback
         region: "pull",
         equipment: "dumbbells",
         intensity: 2,
@@ -156,6 +211,7 @@ export const EXERCISES: Exercise[] = [
     {
         id: "pullup",
         name: "Pull-up",
+        imageName: "pull-up",
         region: "pull",
         equipment: "pullupbar",
         intensity: 3,
@@ -166,6 +222,7 @@ export const EXERCISES: Exercise[] = [
     {
         id: "chinup-negative",
         name: "Chin-up negative",
+        imageName: "negative-pull-up",
         region: "pull",
         equipment: "pullupbar",
         intensity: 3,
@@ -176,6 +233,7 @@ export const EXERCISES: Exercise[] = [
     {
         id: "bar-hang",
         name: "Active bar hang",
+        imageName: "dead-hang",
         region: "pull",
         equipment: "pullupbar",
         intensity: 1,
@@ -186,6 +244,7 @@ export const EXERCISES: Exercise[] = [
     {
         id: "table-row",
         name: "Table / towel row",
+        imageName: "inverted-row",
         region: "pull",
         equipment: "none",
         intensity: 2,
@@ -196,6 +255,7 @@ export const EXERCISES: Exercise[] = [
     {
         id: "prone-swimmer",
         name: "Prone swimmer",
+        imageName: "reverse-snow-angel", // fallback
         region: "pull",
         equipment: "none",
         intensity: 1,
@@ -203,10 +263,10 @@ export const EXERCISES: Exercise[] = [
         unit: "reps",
         cue: "Lie face down with arms extended overhead. Lift them slightly and slowly sweep them outward, down, and toward your sides before returning overhead. Keep movements controlled and avoid shrugging your shoulders.",
     },
-
     {
         id: "band-facepull",
         name: "Band face pull",
+        imageName: "banded-face-pull",
         region: "pull",
         equipment: "bands",
         intensity: 1,
@@ -217,6 +277,7 @@ export const EXERCISES: Exercise[] = [
     {
         id: "db-renegade-row",
         name: "Renegade row",
+        imageName: "dumbbell-bent-over-row", // fallback
         region: "pull",
         equipment: "dumbbells",
         intensity: 3,
@@ -227,6 +288,7 @@ export const EXERCISES: Exercise[] = [
     {
         id: "chinup",
         name: "Chin-up",
+        imageName: "pull-up", // fallback
         region: "pull",
         equipment: "pullupbar",
         intensity: 3,
@@ -234,11 +296,46 @@ export const EXERCISES: Exercise[] = [
         unit: "reps",
         cue: "Grip the bar with palms facing you and hands about shoulder width. Start from a controlled hang, brace your core, and pull your elbows down toward your ribs until your chin clears the bar. Lower slowly.",
     },
+    // new
+    {
+        id: "db-bent-row",
+        name: "Dumbbell bent-over row",
+        imageName: "dumbbell-bent-over-row",
+        region: "pull",
+        equipment: "dumbbells",
+        intensity: 3,
+        minLevel: 1,
+        unit: "reps",
+        cue: "Hinge at the hips with a flat back and dumbbells hanging below your shoulders. Brace your core and pull both elbows toward your hips. Squeeze your upper back briefly, then lower with control.",
+    },
+    {
+        id: "band-pull-apart",
+        name: "Band pull-apart",
+        imageName: "banded-face-pull", // fallback
+        region: "pull",
+        equipment: "bands",
+        intensity: 1,
+        minLevel: 0,
+        unit: "reps",
+        cue: "Hold a band in front of you at chest height with arms straight. Brace your core and pull your hands apart by squeezing your shoulder blades together. Return slowly without shrugging.",
+    },
+    {
+        id: "band-single-arm-row",
+        name: "Band single-arm row",
+        imageName: "banded-row", // fallback
+        region: "pull",
+        equipment: "bands",
+        intensity: 2,
+        minLevel: 0,
+        unit: "reps",
+        cue: "Anchor the band in front of you at waist height and hold one handle. Stand tall, brace your core, and pull your elbow back toward your hip without twisting. Pause, then return slowly. Complete both sides.",
+    },
 
     // ---- legs
     {
         id: "squat",
         name: "Bodyweight squat",
+        imageName: "bodyweight-squat",
         region: "legs",
         equipment: "none",
         intensity: 2,
@@ -249,6 +346,7 @@ export const EXERCISES: Exercise[] = [
     {
         id: "split-squat",
         name: "Split squat",
+        imageName: "split-squat",
         region: "legs",
         equipment: "none",
         intensity: 3,
@@ -259,6 +357,7 @@ export const EXERCISES: Exercise[] = [
     {
         id: "reverse-lunge",
         name: "Reverse lunge",
+        imageName: "reverse-lunge",
         region: "legs",
         equipment: "none",
         intensity: 2,
@@ -269,6 +368,7 @@ export const EXERCISES: Exercise[] = [
     {
         id: "glute-bridge",
         name: "Glute bridge",
+        imageName: "glute-bridge",
         region: "legs",
         equipment: "none",
         intensity: 1,
@@ -279,6 +379,7 @@ export const EXERCISES: Exercise[] = [
     {
         id: "single-leg-rdl",
         name: "Single-leg RDL",
+        imageName: "single-leg-romanian-deadlift",
         region: "legs",
         equipment: "none",
         intensity: 2,
@@ -289,6 +390,7 @@ export const EXERCISES: Exercise[] = [
     {
         id: "wall-sit",
         name: "Wall sit",
+        imageName: "wall-sit",
         region: "legs",
         equipment: "none",
         intensity: 2,
@@ -299,6 +401,7 @@ export const EXERCISES: Exercise[] = [
     {
         id: "calf-raise",
         name: "Slow calf raise",
+        imageName: "calf-raise",
         region: "legs",
         equipment: "none",
         intensity: 1,
@@ -309,6 +412,7 @@ export const EXERCISES: Exercise[] = [
     {
         id: "db-goblet-squat",
         name: "Goblet squat",
+        imageName: "goblet-squat",
         region: "legs",
         equipment: "dumbbells",
         intensity: 3,
@@ -319,6 +423,7 @@ export const EXERCISES: Exercise[] = [
     {
         id: "db-rdl",
         name: "Dumbbell RDL",
+        imageName: "romanian-deadlift",
         region: "legs",
         equipment: "dumbbells",
         intensity: 3,
@@ -329,6 +434,7 @@ export const EXERCISES: Exercise[] = [
     {
         id: "band-abduction",
         name: "Band lateral walk",
+        imageName: "banded-lateral-walk",
         region: "legs",
         equipment: "bands",
         intensity: 1,
@@ -339,6 +445,7 @@ export const EXERCISES: Exercise[] = [
     {
         id: "bulgarian-split-squat",
         name: "Bulgarian split squat",
+        imageName: "bulgarian-split-squat",
         region: "legs",
         equipment: "none",
         intensity: 3,
@@ -349,6 +456,7 @@ export const EXERCISES: Exercise[] = [
     {
         id: "cossack-squat",
         name: "Cossack squat",
+        imageName: "cossack-squat",
         region: "legs",
         equipment: "none",
         intensity: 3,
@@ -359,6 +467,7 @@ export const EXERCISES: Exercise[] = [
     {
         id: "db-lunge",
         name: "Dumbbell walking lunge",
+        imageName: "walking-lunge",
         region: "legs",
         equipment: "dumbbells",
         intensity: 3,
@@ -369,6 +478,7 @@ export const EXERCISES: Exercise[] = [
     {
         id: "single-leg-bridge",
         name: "Single-leg glute bridge",
+        imageName: "single-leg-glute-bridge",
         region: "legs",
         equipment: "none",
         intensity: 2,
@@ -376,10 +486,68 @@ export const EXERCISES: Exercise[] = [
         unit: "reps",
         cue: "Lie on your back with one foot planted and the other leg extended. Brace your core, drive through the planted heel, and lift your hips while keeping them level. Squeeze the glute at the top, then lower slowly.",
     },
+    // new
+    {
+        id: "lateral-lunge",
+        name: "Lateral lunge",
+        imageName: "cossack-squat", // fallback
+        region: "legs",
+        equipment: "none",
+        intensity: 2,
+        minLevel: 0,
+        unit: "reps",
+        cue: "Stand tall with feet together. Step wide to one side, push your hips back, and bend that knee while the other leg stays straight. Keep your chest lifted and heel down, then push back to the start.",
+    },
+    {
+        id: "curtsy-lunge",
+        name: "Curtsy lunge",
+        imageName: "reverse-lunge", // fallback
+        region: "legs",
+        equipment: "none",
+        intensity: 2,
+        minLevel: 1,
+        unit: "reps",
+        cue: "Stand tall and step one foot diagonally behind the other. Lower until both knees bend comfortably, keeping your front knee tracking over your toes and chest up. Drive through the front foot to return.",
+    },
+    {
+        id: "db-split-squat",
+        name: "Dumbbell split squat",
+        imageName: "split-squat", // fallback
+        region: "legs",
+        equipment: "dumbbells",
+        intensity: 3,
+        minLevel: 1,
+        unit: "reps",
+        cue: "Hold dumbbells at your sides in a staggered stance. Keep your torso upright and lower the back knee straight toward the floor. Drive through the front foot to stand. Complete the same reps on both sides.",
+    },
+    {
+        id: "band-glute-bridge",
+        name: "Banded glute bridge",
+        imageName: "glute-bridge", // fallback
+        region: "legs",
+        equipment: "bands",
+        intensity: 2,
+        minLevel: 0,
+        unit: "reps",
+        cue: "Place a band above your knees and lie on your back with feet flat. Press your knees gently outward, drive through your heels, and lift your hips. Squeeze your glutes at the top, then lower slowly.",
+    },
+    {
+        id: "single-leg-calf-raise",
+        name: "Single-leg calf raise",
+        imageName: "calf-raise", // fallback
+        region: "legs",
+        equipment: "none",
+        intensity: 2,
+        minLevel: 1,
+        unit: "reps",
+        cue: "Stand on one foot with light hand support for balance. Rise as high as possible onto the ball of your foot, pause, then lower your heel for a controlled 3-second descent. Complete both sides.",
+    },
+
     // ---- core
     {
         id: "plank",
         name: "Front plank",
+        imageName: "plank",
         region: "core",
         equipment: "none",
         intensity: 2,
@@ -390,6 +558,7 @@ export const EXERCISES: Exercise[] = [
     {
         id: "side-plank",
         name: "Side plank",
+        imageName: "side-plank",
         region: "core",
         equipment: "none",
         intensity: 2,
@@ -400,6 +569,7 @@ export const EXERCISES: Exercise[] = [
     {
         id: "deadbug",
         name: "Dead bug",
+        imageName: "dead-bug",
         region: "core",
         equipment: "none",
         intensity: 1,
@@ -410,6 +580,7 @@ export const EXERCISES: Exercise[] = [
     {
         id: "hollow-hold",
         name: "Hollow hold",
+        imageName: "hollow-body-hold",
         region: "core",
         equipment: "none",
         intensity: 3,
@@ -420,6 +591,7 @@ export const EXERCISES: Exercise[] = [
     {
         id: "leg-raise",
         name: "Lying leg raise",
+        imageName: "lying-leg-raise",
         region: "core",
         equipment: "none",
         intensity: 2,
@@ -430,6 +602,7 @@ export const EXERCISES: Exercise[] = [
     {
         id: "bird-dog",
         name: "Bird dog",
+        imageName: "bird-dog",
         region: "core",
         equipment: "none",
         intensity: 1,
@@ -440,6 +613,7 @@ export const EXERCISES: Exercise[] = [
     {
         id: "hanging-knee-raise",
         name: "Hanging knee raise",
+        imageName: "hanging-knee-raise",
         region: "core",
         equipment: "pullupbar",
         intensity: 3,
@@ -450,6 +624,7 @@ export const EXERCISES: Exercise[] = [
     {
         id: "db-suitcase-hold",
         name: "Suitcase carry hold",
+        imageName: "farmer-carry",
         region: "core",
         equipment: "dumbbells",
         intensity: 2,
@@ -460,6 +635,7 @@ export const EXERCISES: Exercise[] = [
     {
         id: "russian-twist",
         name: "Russian twist",
+        imageName: "russian-twist",
         region: "core",
         equipment: "none",
         intensity: 2,
@@ -470,6 +646,7 @@ export const EXERCISES: Exercise[] = [
     {
         id: "paloff-press",
         name: "Pallof press",
+        imageName: "pallof-press",
         region: "core",
         equipment: "bands",
         intensity: 2,
@@ -480,6 +657,7 @@ export const EXERCISES: Exercise[] = [
     {
         id: "plank-shoulder-tap",
         name: "Plank shoulder tap",
+        imageName: "plank-shoulder-tap",
         region: "core",
         equipment: "none",
         intensity: 2,
@@ -487,11 +665,57 @@ export const EXERCISES: Exercise[] = [
         unit: "reps",
         cue: "Start in a strong high plank with hands under shoulders. Widen your feet for stability and brace your core. Lift one hand to tap the opposite shoulder without shifting your hips, then alternate sides.",
     },
+    // new
+    {
+        id: "reverse-crunch",
+        name: "Reverse crunch",
+        imageName: "lying-leg-raise", // fallback
+        region: "core",
+        equipment: "none",
+        intensity: 2,
+        minLevel: 0,
+        unit: "reps",
+        cue: "Lie on your back with knees bent over your hips. Brace your abs and curl your pelvis toward your ribs, lifting your hips slightly off the floor. Lower slowly without swinging your legs.",
+    },
+    {
+        id: "band-woodchop",
+        name: "Band woodchop",
+        imageName: "pallof-press", // fallback
+        region: "core",
+        equipment: "bands",
+        intensity: 2,
+        minLevel: 0,
+        unit: "reps",
+        cue: "Anchor the band high to one side and hold it with both hands. Brace your core and pull diagonally down across your body, rotating through your torso and pivoting the back foot. Return slowly. Complete both sides.",
+    },
+    {
+        id: "plank-reach",
+        name: "Plank reach",
+        imageName: "plank-shoulder-tap", // fallback
+        region: "core",
+        equipment: "none",
+        intensity: 2,
+        minLevel: 1,
+        unit: "reps",
+        cue: "Start in a high plank with feet wide. Brace your core and reach one arm straight forward without letting your hips rotate. Return the hand to the floor and alternate sides.",
+    },
+    {
+        id: "high-plank-hold",
+        name: "High plank hold",
+        imageName: "plank", // fallback
+        region: "core",
+        equipment: "none",
+        intensity: 1,
+        minLevel: 0,
+        unit: "seconds",
+        cue: "Place hands under your shoulders with arms straight and legs extended. Push the floor away, brace your abs, and keep your body in one line from head to heels. Breathe steadily throughout.",
+    },
 
     // ---- mobility
     {
         id: "worlds-greatest",
         name: "World's greatest stretch",
+        imageName: "worlds-greatest-stretch",
         region: "mobility",
         equipment: "none",
         intensity: 1,
@@ -502,6 +726,7 @@ export const EXERCISES: Exercise[] = [
     {
         id: "cat-cow",
         name: "Cat-cow",
+        imageName: "cat-cow-stretch",
         region: "mobility",
         equipment: "none",
         intensity: 1,
@@ -512,6 +737,7 @@ export const EXERCISES: Exercise[] = [
     {
         id: "hip-90-90",
         name: "90/90 hip switch",
+        imageName: "kneeling-hip-flexor-stretch", // fallback
         region: "mobility",
         equipment: "none",
         intensity: 1,
@@ -522,6 +748,7 @@ export const EXERCISES: Exercise[] = [
     {
         id: "thoracic-rotation",
         name: "Open book rotation",
+        imageName: "worlds-greatest-stretch", // fallback
         region: "mobility",
         equipment: "none",
         intensity: 1,
@@ -532,6 +759,7 @@ export const EXERCISES: Exercise[] = [
     {
         id: "couch-stretch",
         name: "Couch stretch",
+        imageName: "kneeling-hip-flexor-stretch",
         region: "mobility",
         equipment: "none",
         intensity: 1,
@@ -542,6 +770,7 @@ export const EXERCISES: Exercise[] = [
     {
         id: "deep-squat-hold",
         name: "Deep squat hold",
+        imageName: "bodyweight-squat", // fallback
         region: "mobility",
         equipment: "none",
         intensity: 1,
@@ -552,6 +781,7 @@ export const EXERCISES: Exercise[] = [
     {
         id: "shoulder-dislocate",
         name: "Band shoulder pass-through",
+        imageName: "reverse-snow-angel", // fallback
         region: "mobility",
         equipment: "bands",
         intensity: 1,
@@ -562,6 +792,7 @@ export const EXERCISES: Exercise[] = [
     {
         id: "ankle-rock",
         name: "Half-kneel ankle rock",
+        imageName: "bodyweight-squat", // fallback
         region: "mobility",
         equipment: "none",
         intensity: 1,
@@ -572,6 +803,7 @@ export const EXERCISES: Exercise[] = [
     {
         id: "thread-the-needle",
         name: "Thread the needle",
+        imageName: "cat-cow-stretch", // fallback
         region: "mobility",
         equipment: "none",
         intensity: 1,
@@ -582,6 +814,7 @@ export const EXERCISES: Exercise[] = [
     {
         id: "frog-stretch",
         name: "Frog stretch",
+        imageName: "cossack-squat", // fallback
         region: "mobility",
         equipment: "none",
         intensity: 1,
@@ -592,6 +825,7 @@ export const EXERCISES: Exercise[] = [
     {
         id: "scapular-pushup",
         name: "Scapular push-up",
+        imageName: "scapular-push-up",
         region: "mobility",
         equipment: "none",
         intensity: 1,
@@ -599,11 +833,35 @@ export const EXERCISES: Exercise[] = [
         unit: "reps",
         cue: "Start in a plank with arms completely straight. Without bending your elbows, let your chest sink slightly as the shoulder blades move together. Then push the floor away to spread the shoulder blades. Keep your body stable.",
     },
+    // new
+    {
+        id: "hip-flexor-lunge",
+        name: "Low lunge hip stretch",
+        imageName: "kneeling-hip-flexor-stretch", // fallback
+        region: "mobility",
+        equipment: "none",
+        intensity: 1,
+        minLevel: 0,
+        unit: "seconds",
+        cue: "Step into a low lunge with the back knee on the floor. Tuck your pelvis gently and shift your hips forward until you feel a stretch at the front of the back hip. Keep your chest tall and breathe slowly.",
+    },
+    {
+        id: "quadruped-rockback",
+        name: "Quadruped rock-back",
+        imageName: "cat-cow-stretch", // fallback
+        region: "mobility",
+        equipment: "none",
+        intensity: 1,
+        minLevel: 0,
+        unit: "reps",
+        cue: "Start on hands and knees with a neutral spine. Slowly rock your hips back toward your heels while keeping your back flat. Pause when you feel a comfortable stretch, then return to the start.",
+    },
 
     // ---- cardio / conditioning
     {
         id: "jump-rope",
         name: "Rope skips (or mimic)",
+        imageName: "jump-rope",
         region: "cardio",
         equipment: "none",
         intensity: 2,
@@ -614,6 +872,7 @@ export const EXERCISES: Exercise[] = [
     {
         id: "mountain-climber",
         name: "Mountain climber",
+        imageName: "mountain-climber",
         region: "cardio",
         equipment: "none",
         intensity: 2,
@@ -624,6 +883,7 @@ export const EXERCISES: Exercise[] = [
     {
         id: "step-up",
         name: "Fast step-up",
+        imageName: "step-up",
         region: "cardio",
         equipment: "none",
         intensity: 2,
@@ -634,6 +894,7 @@ export const EXERCISES: Exercise[] = [
     {
         id: "burpee",
         name: "Burpee",
+        imageName: "burpee",
         region: "cardio",
         equipment: "none",
         intensity: 3,
@@ -644,6 +905,7 @@ export const EXERCISES: Exercise[] = [
     {
         id: "shadow-box",
         name: "Shadow boxing",
+        imageName: "high-knees", // fallback
         region: "cardio",
         equipment: "none",
         intensity: 1,
@@ -654,6 +916,7 @@ export const EXERCISES: Exercise[] = [
     {
         id: "squat-jump",
         name: "Squat jump",
+        imageName: "jump-squat",
         region: "cardio",
         equipment: "none",
         intensity: 3,
@@ -664,6 +927,7 @@ export const EXERCISES: Exercise[] = [
     {
         id: "high-knees",
         name: "High knees",
+        imageName: "high-knees",
         region: "cardio",
         equipment: "none",
         intensity: 2,
@@ -674,6 +938,7 @@ export const EXERCISES: Exercise[] = [
     {
         id: "skater-jumps",
         name: "Skater jumps",
+        imageName: "skater-hop",
         region: "cardio",
         equipment: "none",
         intensity: 3,
@@ -684,6 +949,7 @@ export const EXERCISES: Exercise[] = [
     {
         id: "jumping-jacks",
         name: "Jumping jacks",
+        imageName: "jump-rope", // fallback
         region: "cardio",
         equipment: "none",
         intensity: 1,
@@ -691,6 +957,62 @@ export const EXERCISES: Exercise[] = [
         unit: "seconds",
         cue: "Stand tall with feet together and arms at your sides. Jump your feet out while raising your arms overhead, then jump back to the starting position. Stay light on your feet and use a comfortable, steady rhythm.",
     },
+    // new
+    {
+        id: "butt-kicks",
+        name: "Butt kicks",
+        imageName: "high-knees", // fallback
+        region: "cardio",
+        equipment: "none",
+        intensity: 2,
+        minLevel: 0,
+        unit: "seconds",
+        cue: "Jog in place while flicking your heels up toward your glutes. Stay tall, keep your knees pointing down, and stay light on the balls of your feet. Pump your arms and keep a quick, steady rhythm.",
+    },
+    {
+        id: "lateral-shuffle",
+        name: "Lateral shuffle",
+        imageName: "skater-hop", // fallback
+        region: "cardio",
+        equipment: "none",
+        intensity: 2,
+        minLevel: 0,
+        unit: "seconds",
+        cue: "Sink into a slight athletic squat with chest up. Shuffle sideways in quick steps without crossing your feet, then reverse direction. Stay low and light on your feet throughout.",
+    },
+    {
+        id: "plank-jack",
+        name: "Plank jack",
+        imageName: "jump-rope", // fallback
+        region: "cardio",
+        equipment: "none",
+        intensity: 3,
+        minLevel: 1,
+        unit: "seconds",
+        cue: "Start in a high plank with hands under shoulders. Brace your core and jump your feet wide, then back together, like a horizontal jumping jack. Keep your hips level and land softly.",
+    },
 ];
 
+/**
+ * A map from exercise IDs to their corresponding exercises.
+ */
 export const EXERCISE_BY_ID = new Map(EXERCISES.map((e) => [e.id, e]));
+
+
+/**
+ * Dev-time check. Pass the slugs that actually exist in your animation
+ * library to catch any imageName that doesn't resolve, plus duplicate ids.
+ */
+export function validateExercises(availableImageNames?: Set<string>): void {
+    const seen = new Set<string>();
+    for (const e of EXERCISES) {
+        if (seen.has(e.id)) console.warn("Duplicate exercise id:", e.id);
+        seen.add(e.id);
+    }
+    if (availableImageNames) {
+        const broken = EXERCISES.filter((e) => !availableImageNames.has(e.imageName)).map(
+            (e) => `${e.id} -> ${e.imageName}`,
+        );
+        if (broken.length) console.warn("imageName not found:", broken);
+    }
+}

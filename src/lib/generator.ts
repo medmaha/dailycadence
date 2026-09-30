@@ -29,10 +29,11 @@ const RECOVERY_PATTERN: Region[] = ["mobility", "mobility", "core", "mobility", 
  * @param history - The user's session history.
  * @returns The generated workout.
  */
-export function generateWorkout(profile: Profile, history: SessionLog[]): Workout {
+export function generateWorkout(profile: Profile, history: SessionLog[], seed = ""): Workout {
     const date = todayKey();
-    const rand = pseudoRandom(date + profile.goal + profile.level + profile.equipment.join(""));
-
+    const rand = pseudoRandom(
+        date + profile.goal + profile.level + profile.equipment.join("") + seed,
+    );
     const recovery = needsRecovery(history);
 
     // Determine the number of exercises to be included in the workout.
@@ -215,10 +216,10 @@ function prescription(ex: Exercise, profile: Profile): PlannedExercise {
                 ? 15 // Higher target for endurance sessions in seconds
                 : 4 // Higher target for endurance sessions in reps
             : profile.goal === "strength"
-                ? isTime
-                    ? 0 // No change for strength sessions in seconds
-                    : 2 // Higher target for strength sessions in reps
-                : 0; // No change for general and mobility sessions
+              ? isTime
+                  ? 0 // No change for strength sessions in seconds
+                  : 2 // Higher target for strength sessions in reps
+              : 0; // No change for general and mobility sessions
 
     // Calculate the level modifier based on the user's level
     const levelMod = isTime ? li * 8 : li * 3;
@@ -238,34 +239,34 @@ function prescription(ex: Exercise, profile: Profile): PlannedExercise {
                 ? -8
                 : -3 // Harder exercises: lower target (fewer reps/seconds expected)
             : ex.intensity === 1
-                ? isTime
-                    ? 8
-                    : 3 // Easier exercises: higher target (more reps/seconds expected)
-                : 0; // No change for moderate (intensity 2) exercises
+              ? isTime
+                  ? 8
+                  : 3 // Easier exercises: higher target (more reps/seconds expected)
+              : 0; // No change for moderate (intensity 2) exercises
 
     // Calculate the number of sets for the exercise
     const sets =
         profile.goal === "strength"
-            ? li >= 1
-                ? 4
-                : 3 // 4 sets for strength sessions above beginner
+            ? Math.min(li + 1, 3) // 1-3 sets for strength sessions
             : ex.region === "mobility"
-                ? 2
-                : 3; // 2 sets for mobility exercises
+              ? 2
+              : profile.goal === "endurance"
+                ? 3
+                : 1;
 
     // Calculate the rest time for the exercise
     const rest =
         ex.region === "mobility"
             ? 20 // 20 seconds rest time for mobility exercises
             : profile.goal === "strength"
-                ? 75
-                : 45; // 75 seconds rest time for strength sessions
+              ? 75
+              : 45; // 75 seconds rest time for strength sessions
 
     return {
         exerciseId: ex.id,
-        sets,
         target: Math.max(isTime ? 20 : 5, base + goalMod + levelMod + easeMod),
         rest,
+        sets,
     };
 }
 
@@ -338,10 +339,10 @@ function titleFor(regions: Region[], goal: Goal) {
         goal === "strength"
             ? "strength"
             : goal === "endurance"
-                ? "circuit"
-                : goal === "mobility"
-                    ? "flow"
-                    : "session";
+              ? "circuit"
+              : goal === "mobility"
+                ? "flow"
+                : "session";
 
     // Return the generated title.
     if (regions.length >= 3) {

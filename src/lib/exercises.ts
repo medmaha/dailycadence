@@ -13,10 +13,6 @@ export const REGION_LABEL: Record<Region, string> = {
     cardio: "Conditioning", // Conditioning exercises
 };
 
-/**
- * A map from exercise IDs to their corresponding exercises.
- */
-export const EXERCISE_BY_ID = new Map(EXERCISES.map((e) => [e.id, e]));
 
 /**
  * Checks if an exercise is available based on the user's equipment.

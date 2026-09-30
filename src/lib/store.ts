@@ -1,5 +1,3 @@
-import { useEffect, useState } from "react";
-
 import type { SessionLog } from "./types";
 import { useProfileStore } from "@/stores/profileStore";
 import { useExerciseStore } from "@/stores/exerciseStore";
@@ -16,27 +14,15 @@ export function daysBetween(a: string, b: string) {
     return Math.round((db - da) / 86_400_000);
 }
 
-export function getHistory() {
-    return useExerciseStore.getState().history
-}
-
-export function getProfile() {
-    return useProfileStore.getState().profile
-}
-
-export function saveSession(log: SessionLog) {
-    useExerciseStore.getState().updateHistory(log)
-}
-
 export function clearToday() {
-    useExerciseStore.getState().setToday(null)
-    useExerciseStore.getState().setActive(null)
+    useExerciseStore.getState().setToday(null);
+    useExerciseStore.getState().setActive(null);
 }
 
 export function resetAll() {
-    clearToday()
-    useProfileStore.getState().updateProfile(null)
-    useExerciseStore.getState().updateHistory(null)
+    clearToday();
+    useProfileStore.getState().updateProfile(null);
+    useExerciseStore.getState().updateHistory(null);
 }
 
 /** Consecutive-day streak ending today or yesterday. */

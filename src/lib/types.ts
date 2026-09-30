@@ -13,6 +13,7 @@ export type Exercise = {
     minLevel: 0 | 1 | 2;
     unit: "reps" | "seconds";
     cue: string;
+    imageName: string
 };
 
 //
