@@ -1,4 +1,3 @@
-import { z } from "zod";
 import { createServerFn } from "@tanstack/react-start";
 import { generateUUIDFromString } from "@/lib/utils.server";
 import { readEnv, readEnvAndParseNumber } from "@/lib/helpers";
@@ -20,22 +19,44 @@ const isValidTimeZone = (tz: string) => {
     }
 };
 
-// 1. Define a schema for your parameters
-const scheduleSchema = z.object({
-    userId: z.string(),
-    timezone: z.string().refine(isValidTimeZone, "Invalid IANA time zone"),
-    reminder: z.object({
-        time: z.string(), // eg. "06:30"
-        message: z.string(),
-        days: z.array(z.number()), // 0=Mon ... 6=Sun
-        storageId: z.string().nullish(), // comma-joined notification ids
-        ringtoneId: z.string().nullish(),
-        _pushMsgTimes: z.array(z.number()).nullish(),
-    }),
-});
+interface Reminder {
+    time: string;
+    message: string;
+    days: number[];
+    storageId?: string | null;
+    ringtoneId?: string | null;
+    _pushMsgTimes?: number[] | null;
+}
+
+interface ScheduleInput {
+    userId: string;
+    timezone: string;
+    reminder: Reminder;
+}
+
+function _validateScheduleInput(data: ScheduleInput): ScheduleInput {
+    if (typeof data !== "object" || data === null) {
+        throw new Error("Invalid input: expected object");
+    }
+    if (!isValidTimeZone(data.timezone)) {
+        throw new Error(`Invalid timezone - ${data.timezone}`);
+    }
+    return {
+        userId: data["userId"] as string,
+        timezone: data["timezone"] as string,
+        reminder: {
+            days: data["reminder"]["days"],
+            time: data["reminder"]["time"],
+            message: data["reminder"]["message"],
+            storageId: data["reminder"]["storageId"] || null,
+            ringtoneId: data["reminder"]["ringtoneId"] || null,
+            _pushMsgTimes: data["reminder"]["_pushMsgTimes"] || null,
+        },
+    };
+}
 
 export const scheduleReminder = createServerFn()
-    .validator(scheduleSchema)
+    .validator(_validateScheduleInput)
     .handler(async ({ data }) => {
         const { userId, timezone, reminder } = data;
         if (reminder.storageId) return null; // already scheduled
@@ -69,7 +90,12 @@ export const scheduleReminder = createServerFn()
     });
 
 export const cancelNotification = createServerFn()
-    .validator(z.string()) // comma-joined ids
+    .validator((data: unknown) => {
+        if (typeof data !== 'string') {
+            throw new Error('Invalid input: expected string');
+        }
+        return data;
+    })
     .handler(async ({ data }: { data: string }) => {
         const results = await Promise.all(
             data
@@ -90,6 +116,7 @@ export const cancelNotification = createServerFn()
         return results.every(Boolean);
     });
 
+// Used in cron jobs
 export async function sendSlot(slot: string, idempotencyKey: string) {
     const body = JSON.stringify({
         app_id: APP_ID,
