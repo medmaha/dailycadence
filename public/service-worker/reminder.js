@@ -1,1 +1,1 @@
-console.debug("[SW-LOADED]: reminders")
+console.debug("[SW-LOADED]: reminders");
