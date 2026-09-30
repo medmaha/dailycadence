@@ -11,9 +11,9 @@ export function localhostHTTPSPlugin(): Plugin {
                 // Polyfill setHeaders for HTTP/2 responses which lack it, as required by TanStack Start
                 if (!res.setHeaders) {
                     (res as any).setHeaders = (headers: any) => {
-                        if (headers && typeof headers.forEach === 'function') {
+                        if (headers && typeof headers.forEach === "function") {
                             headers.forEach((value: any, key: string) => res.setHeader(key, value));
-                        } else if (typeof headers === 'object' && headers !== null) {
+                        } else if (typeof headers === "object" && headers !== null) {
                             for (const [key, value] of Object.entries(headers)) {
                                 if (value !== undefined) res.setHeader(key, value as any);
                             }

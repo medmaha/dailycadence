@@ -1,0 +1,16 @@
+# .github/workflows/reminders.yml
+name: reminders
+on:
+    workflow_dispatch:
+    schedule:
+        # run every 1 hour and 30 minutes
+        - cron: "30 */1.5 * * *"
+
+if: ${{ secrets.CRON_SECRET != '' && secrets.CRON_ENDPOINT != '' }}
+jobs:
+    ping:
+        runs-on: ubuntu-latest
+        steps:
+            - run: |
+                  curl -fsS -X POST ${{ secrets.CRON_ENDPOINT }} \
+                    -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}"

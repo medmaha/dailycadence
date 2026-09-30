@@ -18,7 +18,11 @@ export function cadencePwaPlugin(): Plugin {
             }
         },
         async writeBundle(options) {
-            if (resolvedConfig.command === "build" && options.dir && options.dir.endsWith("client")) {
+            if (
+                resolvedConfig.command === "build" &&
+                options.dir &&
+                options.dir.endsWith("client")
+            ) {
                 const outDir = options.dir;
                 const swDest = path.join(outDir, "sw.js");
                 await makeBuild({ swDest, outDir });
@@ -32,28 +36,42 @@ async function makeBuild({ swDest, outDir }: { outDir: string; swDest: string })
         const routesDir = path.resolve(process.cwd(), "src/routes");
         let additionalManifestEntries: { url: string; revision: string }[] = [];
         if (fs.existsSync(routesDir)) {
-            const routeFiles = fs.readdirSync(routesDir).filter(f => f.endsWith('.tsx') && !f.startsWith('__'));
+            const routeFiles = fs
+                .readdirSync(routesDir)
+                .filter((f) => f.endsWith(".tsx") && !f.startsWith("__"));
             for (const route of routeFiles) {
                 const revision = String(Date.now());
-                let url
-                if (route === 'index.tsx') {
-                    url = "/"
+                let url;
+                if (route === "index.tsx") {
+                    url = "/";
                 } else {
-                    url = `/${route.replace('.tsx', '')}`
+                    url = `/${route.replace(".tsx", "")}`;
                 }
                 additionalManifestEntries.push({
                     url,
-                    revision
-                })
+                    revision,
+                });
             }
         }
 
         console.log(`ℹ️ Building service-worker in ${swDest}`);
         const { count, size, warnings } = await generateSW({
             swDest,
+            mode: "production",
             sourcemap: false,
             globDirectory: outDir,
             globPatterns: ["**/*.{js,css,html,png,svg,ico,woff2,webmanifest,mp3}"],
+            globIgnores: [
+                "sw.js",
+                "robot.tsx",
+                "sitemap.xml",
+                "workbox-*.js",
+                "onesignal.js",
+                "icon-*.png",
+                "apple-touch-*.png",
+                "*.webmanifest",
+                "service-worker/**",
+            ],
             additionalManifestEntries,
             importScripts: [
                 "./service-worker/push.js",
@@ -80,11 +98,6 @@ async function makeBuild({ swDest, outDir }: { outDir: string; swDest: string })
                         url.origin === "https://fonts.gstatic.com",
                     handler: "StaleWhileRevalidate",
                     options: { cacheName: "fonts" },
-                },
-                {
-                    urlPattern: ({ sameOrigin }) => sameOrigin,
-                    handler: "StaleWhileRevalidate",
-                    options: { cacheName: "app-assets" },
                 },
             ],
         });
