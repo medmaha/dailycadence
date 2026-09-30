@@ -20,7 +20,7 @@ A Progressive Web App that builds one adaptive home workout a day from what you 
 - **Framework**: [TanStack Start](https://tanstack.com/start) (React + SSR)
 - **UI**: React 19, Tailwind CSS v4
 - **State Management**: Zustand
-- **Storage**: IndexedDB (via custom implementation)
+- **Storage**: LocalStorage, IndexedDB (via custom implementation)
 - **Push Notifications**: OneSignal
 - **Build Tool**: Vite
 - **Language**: TypeScript
@@ -85,26 +85,26 @@ Create a `.env` file in the root directory with the following variables:
 | ------------------------ | ----------------------------------------------------------------------- |
 | `APP_NAME`               | The name of the app (default: "Cadence")                                |
 | `APP_VERSION`            | App version number                                                      |
-| `ONESIGNAL_APP_ID`       | Your OneSignal App ID from [onesignal.com](https://onesignal.com)       |
-| `ONESIGNAL_REST_API_KEY` | Your OneSignal REST API Key from [onesignal.com](https://onesignal.com) |
-| `CRON_SECRET`            | Secret token for GitHub Actions cron job authentication                 |
-| `VITE_PRODUCTION_URL`    | Your production deployment URL                                          |
 
 ### Optional Variables
 
-| Variable                                        | Default         | Description                                                 |
-| ----------------------------------------------- | --------------- | ----------------------------------------------------------- |
-| `USE_DEVELOPMENT_HTTPS`                         | `true`          | Enable HTTPS in development                                 |
-| `VITE_SERVICE_WORKER_FILE_PATH`                 | `sw.js`         | Service worker file path                                    |
-| `VITE_RINGTONE_FILE`                            | `/reminder.mp3` | Default reminder sound file                                 |
-| `VITE_RINGTONE_MAX_ITEMS`                       | `3`             | Maximum number of custom ringtones                          |
-| `VITE_RINGTONE_MAX_FILE_SIZE_KB`                | `500`           | Maximum ringtone file size in KB                            |
-| `VITE_RINGTONE_MAX_COMPRESS_SIZE_KB`            | `100`           | Maximum compressed ringtone size in KB                      |
-| `VITE_REMINDER_MAX_ITEMS`                       | `10`            | Maximum number of reminders                                 |
-| `VITE_REMINDER_RESCHEDULE_DAYS_OFFSET`          | `3`             | Days to offset when rescheduling reminders                  |
-| `VITE_REMINDER_RESCHEDULE_PUSH_ON_CONTEXT_EDIT` | `false`         | Reschedule push notifications when editing reminder context |
-| `ONESIGNAL_MAX_REMINDER_TO_SCHEDULE`            | `5`             | Maximum reminders to schedule at once                       |
-| `ONESIGNAL_SCHEDULER_MAX_WINDOW_DAYS`           | `7`             | Maximum days ahead to schedule reminders                    |
+| Variable                                        | Default         | Description                                                             |
+| ----------------------------------------------- | --------------- | ------------------------------------------------------------------------|
+| `USE_DEVELOPMENT_HTTPS`                         | `true`          | Enable HTTPS in development                                             |
+| `VITE_SERVICE_WORKER_FILE_PATH`                 | `sw.js`         | Service worker file path                                                |
+| `VITE_RINGTONE_FILE`                            | `/reminder.mp3` | Default reminder sound file                                             |
+| `VITE_RINGTONE_MAX_ITEMS`                       | `3`             | Maximum number of custom ringtones                                      |
+| `VITE_RINGTONE_MAX_FILE_SIZE_KB`                | `500`           | Maximum ringtone file size in KB                                        |
+| `VITE_RINGTONE_MAX_COMPRESS_SIZE_KB`            | `100`           | Maximum compressed ringtone size in KB                                  |
+| `VITE_REMINDER_MAX_ITEMS`                       | `10`            | Maximum number of reminders                                             |
+| `VITE_REMINDER_RESCHEDULE_DAYS_OFFSET`          | `3`             | Days to offset when rescheduling reminders                              |
+| `VITE_REMINDER_RESCHEDULE_PUSH_ON_CONTEXT_EDIT` | `false`         | Reschedule push notifications when editing reminder context             |
+| `ONESIGNAL_MAX_REMINDER_TO_SCHEDULE`            | `5`             | Maximum reminders to schedule at once                                   |
+| `ONESIGNAL_SCHEDULER_MAX_WINDOW_DAYS`           | `7`             | Maximum days ahead to schedule reminders                                |
+| `ONESIGNAL_APP_ID`                              | ``              | Your OneSignal App ID from [onesignal.com](https://onesignal.com)       |
+| `ONESIGNAL_REST_API_KEY`                        | ``              | Your OneSignal REST API Key from [onesignal.com](https://onesignal.com) |
+| `CRON_SECRET`                                   | ``              | Secret token for GitHub Actions cron job authentication                 |
+| `VITE_PRODUCTION_URL`                           | ``              | Your production deployment URL                                          |
 
 ### Setting Up OneSignal
 
@@ -120,7 +120,7 @@ Create a `.env` file in the root directory with the following variables:
     - `CRON_SECRET`: Use the same value as in your `.env` file
     - `CRON_ENDPOINT`: Your deployed API endpoint (e.g., `https://your-domain.com/api/cron/reminders`)
 
-The workflow runs every 1.5 hours to trigger reminder notifications.
+The workflow runs every 5 hours to trigger reminder rescheduling.
 
 ## Project Structure
 
