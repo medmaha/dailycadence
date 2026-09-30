@@ -1,26 +1,22 @@
-
-
-import { create } from "zustand"
-import { persist, createJSONStorage } from 'zustand/middleware'
-
-import { STORAGE_KEYS } from "./keys";
-
+import { create } from "zustand";
 
 type NotificationStore = {
-    isNotificationsEnabled: () => boolean
-}
+    permission: NotificationPermission | "unsupported";
+    refresh: () => void;
+    isNotificationsEnabled: () => boolean;
+};
 
-export const usePushNotificationStore = create<NotificationStore>()(
-    persist(
-        (set, get) => ({
-            isNotificationsEnabled: () => {
-                const enabled = 'Notification' in window && Notification.permission === 'granted';
-                return enabled
-            }
-        }),
-        {
-            name: STORAGE_KEYS.PUSH_NOTIFICATION,
-            storage: createJSONStorage(() => localStorage),
-        }
-    )
-)
+const readPermission = (): NotificationStore["permission"] =>
+    typeof window !== "undefined" && "Notification" in window
+        ? Notification.permission
+        : "unsupported";
+
+export const usePushNotificationStore = create<NotificationStore>()((set, get) => ({
+    permission: "default",
+    refresh: () => set({ permission: readPermission() }),
+    isNotificationsEnabled: () =>
+        get().permission === "granted" &&
+        typeof navigator !== "undefined" &&
+        "serviceWorker" in navigator &&
+        !!navigator.serviceWorker.controller,
+}));
